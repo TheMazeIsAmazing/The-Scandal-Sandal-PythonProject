@@ -4,7 +4,7 @@ from openai import OpenAI
 import os
 
 client = OpenAI(
-    api_key="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"
+    api_key=os.environ['OPENAI_API_KEY'],
 )
 
 # Making a GET request
