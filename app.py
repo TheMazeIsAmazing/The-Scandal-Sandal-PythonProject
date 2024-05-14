@@ -11,7 +11,7 @@ def get_db_connection():
 
 def get_post(post_id):
     conn = get_db_connection()
-    post = conn.execute('SELECT * FROM posts WHERE id = ?',
+    post = conn.execute('SELECT * FROM articles WHERE id = ?',
                         (post_id,)).fetchone()
     conn.close()
     if post is None:
@@ -26,7 +26,7 @@ app.config['SECRET_KEY'] = 'your secret key'
 @app.route('/')
 def index():
     conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
+    posts = conn.execute('SELECT * FROM articles').fetchall()
     conn.close()
     return render_template('index.html', posts=posts)
 
@@ -83,8 +83,12 @@ def edit(id):
 def delete(id):
     post = get_post(id)
     conn = get_db_connection()
-    conn.execute('DELETE FROM posts WHERE id = ?', (id,))
+    conn.execute('DELETE FROM articles WHERE id = ?', (id,))
     conn.commit()
     conn.close()
-    flash('"{}" was successfully deleted!'.format(post['title']))
+    flash('"{}" was successfully deleted!'.format(post['headline']))
     return redirect(url_for('index'))
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
