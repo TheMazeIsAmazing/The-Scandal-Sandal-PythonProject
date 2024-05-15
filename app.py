@@ -53,102 +53,115 @@ def post(post_id):
 
 
 
-@app.route('/create', methods=('GET', 'POST'))
+@app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
-        url = request.form['url']
-        selector_type = request.form['selector_type']
-        selector = request.form['selector']
-        paragraphs = False
+        # Get form data
+        url = request.form.get('url')
+        selector_type = request.form.get('selector_type')
+        selector = request.form.get('selector')
+        paragraphs = request.form.get("paragraphs") is not None
 
-        if request.form.get("paragraphs"):
-            paragraphs = True
+        # Check if all required fields are provided
+        if not url or not selector_type or not selector:
+            flash('All fields (URL, Selector Type, and Selector) are required!')
+            return render_template('create.html')
 
-        if not url:
-            flash('URL is required!')
-        if not selector_type:
-            flash('Selector Type is required!')
-        if not selector:
-            flash('Selector is required!')
+        # Fetch the URL content
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # Parse the HTML content
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Select the content based on selector type
+        if selector_type == 'id':
+            content_div = soup.find('div', id=selector)
+        elif selector_type == 'html':
+            content_div = soup.select_one(selector)
         else:
-            r = requests.get(url)
-            soup = BeautifulSoup(r.content, 'html.parser')
+            content_div = soup.find('div', class_=selector)
 
-            if selector_type == 'id':
-                content_div = soup.find('div', id=selector)
-            elif selector_type == 'html':
-                content_div = soup.find(selector)
-            else:
-                content_div = soup.find('div', class_=selector)
+        # Check if content was found
+        if not content_div:
+            flash('No content found with the given selector!')
+            return render_template('create.html')
 
-            article_paragraph_string = ''
+        # Extract the text from the content div
+        if paragraphs:
+            # Extract text from all paragraphs if paragraphs option is selected
+            article_text = ' '.join(p.get_text() for p in content_div.find_all('p'))
+        else:
+            article_text = content_div.get_text()
 
-            if paragraphs:
-                # Find all paragraphs within the content div
-                article_paragraphs = content_div.find_all('p')
-                # Extract and concatenate the text from paragraphs
-                for paragraph in article_paragraphs:
-                    article_paragraph_string += paragraph.get_text()
-            else:
-                article_paragraph_string = content_div.get_text()
+        # Call OpenAI API to grade the article
+        grading_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You will get a text, please grade it on a few criteria. "
+                        "1: Customer Service and Care, 2: (Software) Reliability and 3: Responsibility. "
+                        "Grade them on a scale from 0 to 2. If you're unable to grade it, please state 'undefined' at the specific criteria. "
+                        "Under Headline get the article's headline from the h1, or header. "
+                        "Also explain why you chose this score. Return JSON: {\"car_brand\", \"headline\", \"scoring\": {\"customer_service\": {\"grade\", \"explanation\"}, \"reliability\": {\"grade\", \"explanation\"}, \"responsibility\": {\"grade\", \"explanation\"}}}"
+                    )
+                },
+                {"role": "user", "content": article_text}
+            ]
+        )
 
-            grading = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": ("You will get a text, please grade it on a few criteria. "
-                                    "1: Customer Service and Care, 2: (Software) Reliability and 3: Responsibility. "
-                                    "Grade them on a scale from 0 to 2. If you're unable to grade it, please state 'undefined' at the specific criteria. "
-                                    "Also explain why you chose this score. Return JSON: {\"car_brand\", \"headline\", \"scoring\": {\"customer_service\": {\"grade\", \"explanation\"}, \"reliability\": {\"grade\", \"explanation\"}, \"responsibility\": {\"grade\", \"explanation\"}}}")
-                    },
-                    {
-                        "role": "user",
-                        "content": article_paragraph_string
-                    }
-                ]
-            )
+        # Call OpenAI API to clean the article text
+        cleaned_article_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Return the article text within one string without linebreaks, with things like: "
+                        "'read more after the picture' and 'sign up now' removed."
+                    )
+                },
+                {"role": "user", "content": article_text}
+            ]
+        )
 
-            cleaned_article = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": ("Return the article text within one string without linebreaks, with things like: "
-                                    "'read more after the picture' and 'sign up now' removed.")
-                    },
-                    {
-                        "role": "user",
-                        "content": article_paragraph_string
-                    }
-                ]
-            )
+        # Parse the responses from OpenAI
+        grading_result = json.loads(grading_response.choices[0].message.content)
+        cleaned_article = cleaned_article_response.choices[0].message.content
 
-            json_object = json.loads(grading.choices[0].message.content)
-            # json_object_cleaned_stuff = json.loads(cleaned_article.choices[0].message.content)
+        # Prepare the data for the database
+        article_data = {
+            'company': grading_result['car_brand'],
+            'headline': grading_result['headline'],
+            'content': cleaned_article,
+            'score_openai_customer_service': grading_result['scoring']['customer_service']['grade'],
+            'ex_score_openai_customer_service': grading_result['scoring']['customer_service']['explanation'],
+            'score_openai_reliability': grading_result['scoring']['reliability']['grade'],
+            'ex_score_openai_reliability': grading_result['scoring']['reliability']['explanation'],
+            'score_openai_responsibility': grading_result['scoring']['responsibility']['grade'],
+            'ex_score_openai_responsibility': grading_result['scoring']['responsibility']['explanation']
+        }
 
-            # return redirect(url_for('reviewchatgpt', data=json_object['scoring']['customer_service']['grade']))
-
-            company = json_object['car_brand']
-            headline = json_object['headline']
-            content = cleaned_article.choices[0].message.content
-            score_openai_customer_service = json_object['scoring']['customer_service']['grade']
-            ex_score_openai_customer_service = json_object['scoring']['customer_service']['explanation']
-            score_openai_reliability = json_object['scoring']['reliability']['grade']
-            ex_score_openai_reliability = json_object['scoring']['reliability']['explanation']
-            score_openai_responsibility = json_object['scoring']['responsibility']['grade']
-            ex_score_openai_responsibility = json_object['scoring']['responsibility']['explanation']
-
-            conn = get_db_connection()
+        # Insert the data into the database
+        with get_db_connection() as conn:
             conn.execute(
-                'INSERT INTO articles (company, url, headline, content, score_openai_customer_service, ex_score_openai_customer_service, score_openai_reliability, ex_score_openai_reliability, score_openai_responsibility, ex_score_openai_responsibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                (company, url, headline, content, score_openai_customer_service, ex_score_openai_customer_service,
-                 score_openai_reliability, ex_score_openai_reliability, score_openai_responsibility,
-                 ex_score_openai_responsibility))
+                '''INSERT INTO articles 
+                (company, url, headline, content, score_openai_customer_service, ex_score_openai_customer_service, 
+                score_openai_reliability, ex_score_openai_reliability, score_openai_responsibility, ex_score_openai_responsibility) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (article_data['company'], url, article_data['headline'], article_data['content'],
+                 article_data['score_openai_customer_service'], article_data['ex_score_openai_customer_service'],
+                 article_data['score_openai_reliability'], article_data['ex_score_openai_reliability'],
+                 article_data['score_openai_responsibility'], article_data['ex_score_openai_responsibility'])
+            )
             conn.commit()
-            conn.close()
-            return redirect(url_for('index'))
 
+        # Redirect to the index page after successful insertion
+        return redirect(url_for('index'))
+
+    # Render the create.html template for GET requests
     return render_template('create.html')
 
 
@@ -187,7 +200,3 @@ def delete(id):
 @app.route('/about')
 def about():
     return render_template('about.html')
-
-@app.route('/<string:data>/reviewchatgpt')
-def reviewchatgpt(data):
-    return render_template('reviewchatgpt.html', data=data)
