@@ -1,5 +1,7 @@
 import sqlite3
-from flask import Flask, render_template, request, url_for, flash, redirect
+from statistics import mean
+import xmltodict
+from flask import Flask, render_template, request, url_for, flash, redirect, jsonify, Response
 from werkzeug.exceptions import abort
 import requests
 from bs4 import BeautifulSoup
@@ -200,3 +202,39 @@ def delete(id):
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/api')
+def api():
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles').fetchall()
+    conn.close()
+
+    car_brand_scores = {}
+
+    articles_list = [dict(article) for article in articles]
+
+    for article in articles_list:
+        car_brand = article.get('company')
+
+        if car_brand not in car_brand_scores:
+            car_brand_scores[car_brand] = {
+                'customer_service': [int(article.get('score_openai_customer_service'))],
+                'reliability': [int(article.get('score_openai_reliability'))],
+                'responsibility': [int(article.get('score_openai_responsibility'))]
+            }
+        else:
+            car_brand_scores[car_brand]['customer_service'].append(int(article.get('score_openai_customer_service')))
+            car_brand_scores[car_brand]['reliability'].append(int(article.get('score_openai_reliability')))
+            car_brand_scores[car_brand]['responsibility'].append(int(article.get('score_openai_responsibility')))
+
+    for car_brand, scores in car_brand_scores.items():
+        for category in scores:
+            scores[category] = mean(scores[category])
+
+    # Check if the request explicitly accepts XML
+    if 'application/xml' in request.headers.get('Accept', ''):
+        xml_output = xmltodict.unparse({'car_brand_scores': car_brand_scores}, pretty=True)
+        return Response(xml_output, mimetype='application/xml')
+    else:
+        # If the request doesn't specify a preference, or prefers JSON, return JSON
+        return jsonify(car_brand_scores)
