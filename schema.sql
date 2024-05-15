@@ -11,6 +11,8 @@ CREATE TABLE posts (
 CREATE TABLE articles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    company TEXT NOT NULL,
+    url TEXT NOT NULL,
     headline TEXT NOT NULL,
     content TEXT NOT NULL,
     score_openai_customer_service SMALLINT NOT NULL,

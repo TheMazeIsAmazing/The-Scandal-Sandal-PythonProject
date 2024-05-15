@@ -49,7 +49,7 @@ completion = client.chat.completions.create(
     messages=[
         {
           "role": "system",
-          "content": "You will get a text, please grade it on a few criteria. 1: Customer Service and Care, 2: (Software) Reliability and 3: Responsibility. Grade them on a scale from 0 to 2. If you're unable to grade it, please state 'undefined' at the specific criteria. Also explain why you chose this score. Return JSON: {\"headline\", \"scoring\": {\"customer_service\": {\"grade\", \"explanation\"}, \"reliability\": {\"grade\", \"explanation\"}, \"responsibility\": {\"grade\", \"explanation\"}}}"
+          "content": "You will get a text, please grade it on a few criteria. 1: Customer Service and Care, 2: (Software) Reliability and 3: Responsibility. Grade them on a scale from 0 to 2. If you're unable to grade it, please state 'undefined' at the specific criteria. Also explain why you chose this score. Return JSON: {\"car_brand\", \"headline\", \"scoring\": {\"customer_service\": {\"grade\", \"explanation\"}, \"reliability\": {\"grade\", \"explanation\"}, \"responsibility\": {\"grade\", \"explanation\"}}}"
         },
         {
           "role": "user",

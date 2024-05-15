@@ -5,17 +5,34 @@
 
 <form method="post">
     <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" name="title"
-               placeholder="Post title" class="form-control"
-               value="{{ request.form['title'] }}"></input>
+        <label for="url">URL</label>
+        <input id="url" type="text" name="url"
+               placeholder="Article URL" class="form-control"
+               value="{{ request.form['url'] }}"></input>
     </div>
 
     <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" placeholder="Post content"
-                  class="form-control">{{ request.form['content'] }}</textarea>
+        <label for="selector_type">Selector type</label>
+        <select id="selector_type" name="selector_type" class="form-control">
+            <option value="class">Class</option>
+            <option value="id">ID</option>
+            <option value="html">HTML-Tag</option>
+        </select>
     </div>
+
+    <div class="form-group">
+        <label for="selector">Selector</label>
+        <input id="selector" type="text" name="selector"
+               placeholder="Article selector" class="form-control"
+               value="{{ request.form['selector'] }}"></input>
+    </div>
+
+    <div class="form-group">
+        <label for="paragraphs">Get all paragraphs</label>
+        <input id="paragraphs" type="checkbox" name="paragraphs"
+               class="form-control" value="{{ request.form['paragraphs'] }}"></input>
+    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
