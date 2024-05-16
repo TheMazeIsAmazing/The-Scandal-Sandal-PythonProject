@@ -20,6 +20,7 @@ client = OpenAI(
     api_key=os.getenv('OPENAI_API_KEY'),
 )
 
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -36,7 +37,11 @@ def get_post(post_id):
     return post
 
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_url_path='',
+            static_folder='static',
+            template_folder='templates')
+
 app.config['SECRET_KEY'] = 'your secret key'
 
 
@@ -48,11 +53,10 @@ def index():
     return render_template('index.html', posts=posts)
 
 
-@app.route('/<int:post_id>')
+@app.route('/articles/<int:post_id>')
 def post(post_id):
     post = get_post(post_id)
     return render_template('post.html', post=post)
-
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -92,7 +96,8 @@ def create():
         # Extract the text from the content div
         if paragraphs:
             # Extract text from all paragraphs if paragraphs option is selected
-            article_text = ' '.join(p.get_text() for p in content_div.find_all('p'))
+            article_text = ' '.join(p.get_text()
+                                    for p in content_div.find_all('p'))
         else:
             article_text = content_div.get_text()
 
@@ -130,12 +135,13 @@ def create():
         )
 
         # Parse the responses from OpenAI
-        grading_result = json.loads(grading_response.choices[0].message.content)
+        grading_result = json.loads(
+            grading_response.choices[0].message.content)
         cleaned_article = cleaned_article_response.choices[0].message.content
 
         # Prepare the data for the database
         article_data = {
-            'company': grading_result['car_brand'],
+            'company': grading_result['car_brand'].lower(),
             'headline': grading_result['headline'],
             'content': cleaned_article,
             'score_openai_customer_service': grading_result['scoring']['customer_service']['grade'],
@@ -199,9 +205,11 @@ def delete(id):
     flash('"{}" was successfully deleted!'.format(post['headline']))
     return redirect(url_for('index'))
 
+
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 
 @app.route('/api')
 def api():
@@ -223,9 +231,12 @@ def api():
                 'responsibility': [int(article.get('score_openai_responsibility'))]
             }
         else:
-            car_brand_scores[car_brand]['customer_service'].append(int(article.get('score_openai_customer_service')))
-            car_brand_scores[car_brand]['reliability'].append(int(article.get('score_openai_reliability')))
-            car_brand_scores[car_brand]['responsibility'].append(int(article.get('score_openai_responsibility')))
+            car_brand_scores[car_brand]['customer_service'].append(
+                int(article.get('score_openai_customer_service')))
+            car_brand_scores[car_brand]['reliability'].append(
+                int(article.get('score_openai_reliability')))
+            car_brand_scores[car_brand]['responsibility'].append(
+                int(article.get('score_openai_responsibility')))
 
     for car_brand, scores in car_brand_scores.items():
         for category in scores:
@@ -233,8 +244,62 @@ def api():
 
     # Check if the request explicitly accepts XML
     if 'application/xml' in request.headers.get('Accept', ''):
-        xml_output = xmltodict.unparse({'car_brand_scores': car_brand_scores}, pretty=True)
+        xml_output = xmltodict.unparse(
+            {'car_brand_scores': car_brand_scores}, pretty=True)
         return Response(xml_output, mimetype='application/xml')
     else:
         # If the request doesn't specify a preference, or prefers JSON, return JSON
         return jsonify(car_brand_scores)
+
+
+@app.route('/api/integration/<company>')
+def integration(company):
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
+                            (company.lower(),)).fetchall()
+    conn.close()
+
+    car_brand_score = {}
+
+    articles_list = [dict(article) for article in articles]
+
+    for article in articles_list:
+        car_brand = article.get('company')
+
+        if car_brand.lower() not in car_brand_score:
+            car_brand_score[car_brand] = {
+                'customer_service': [int(article.get('score_openai_customer_service'))],
+                'reliability': [int(article.get('score_openai_reliability'))],
+                'responsibility': [int(article.get('score_openai_responsibility'))]
+            }
+        else:
+            car_brand_score[car_brand]['customer_service'].append(
+                int(article.get('score_openai_customer_service')))
+            car_brand_score[car_brand]['reliability'].append(
+                int(article.get('score_openai_reliability')))
+            car_brand_score[car_brand]['responsibility'].append(
+                int(article.get('score_openai_responsibility')))
+
+    for car_brand, scores in car_brand_score.items():
+        for category in scores:
+            scores[category] = mean(scores[category])
+
+    return render_template('iframe.html',
+                           company=company,
+                           customer_service=car_brand_score[car_brand]['customer_service'],
+                           reliability=car_brand_score[car_brand]['reliability'],
+                           responsibility=car_brand_score[car_brand]['responsibility'],
+                           average=round(mean([car_brand_score[car_brand]['customer_service'],
+                                               car_brand_score[car_brand]['reliability'],
+                                               car_brand_score[car_brand]['responsibility']
+                                        ]))
+                           )
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
