@@ -10,25 +10,43 @@
                 </div>
                 <div class="scores">
                     {% if customer_service == 1 %}
-                    <div class="score scores1">Customer Service and Care<div id="customer-service-score"></div></div>
+                    <div class="score scores1">Customer Service and Care
+                        <div id="customer-service-score"></div>
+                    </div>
                     {% elif customer_service == 2 %}
-                    <div class="score scores2">Customer Service and Care<div id="customer-service-score"></div></div>
+                    <div class="score scores2">Customer Service and Care
+                        <div id="customer-service-score"></div>
+                    </div>
                     {% else %}
-                    <div class="score scores0">Customer Service and Care<div id="customer-service-score"></div></div>
+                    <div class="score scores0">Customer Service and Care
+                        <div id="customer-service-score"></div>
+                    </div>
                     {% endif %}
                     {% if reliability == 1 %}
-                    <div class="score scores1">(Software) Reliability<div id="reliability-score"></div></div>
+                    <div class="score scores1">(Software) Reliability
+                        <div id="reliability-score"></div>
+                    </div>
                     {% elif reliability == 2 %}
-                    <div class="score scores2">(Software) Reliability<div id="reliability-score"></div></div>
+                    <div class="score scores2">(Software) Reliability
+                        <div id="reliability-score"></div>
+                    </div>
                     {% else %}
-                    <div class="score scores0">(Software) Reliability<div id="reliability-score"></div></div>
+                    <div class="score scores0">(Software) Reliability
+                        <div id="reliability-score"></div>
+                    </div>
                     {% endif %}
                     {% if responsibility == 1 %}
-                    <div class="score scores1">Responsibility<div id="responsibility-score"></div></div>
+                    <div class="score scores1">Responsibility
+                        <div id="responsibility-score"></div>
+                    </div>
                     {% elif responsibility == 2 %}
-                    <div class="score scores2">Responsibility<div id="responsibility-score"></div></div>
+                    <div class="score scores2">Responsibility
+                        <div id="responsibility-score"></div>
+                    </div>
                     {% else %}
-                    <div class="score scores0">Responsibility<div id="responsibility-score"></div></div>
+                    <div class="score scores0">Responsibility
+                        <div id="responsibility-score"></div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -105,27 +123,27 @@
         flex: 1;
     }
 
-    .iframe-able .scores .score  {
+    .iframe-able .scores .score {
         position: relative;
         background-color: white;
         border: 1px solid #000;
         border-radius: 10px;
-        padding: 5px;
+        padding: 10px;
         flex: 1;
-        text-align: center;
-        vertical-align: center;
+        text-align: left;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
     }
 
-    .iframe-able .scores .score div  {
+    .iframe-able .scores .score div {
         background-color: white;
         border: 1px solid #000;
         border-radius: 15px;
-        padding: 7px;
-        position: absolute;
-        right: 5px;
+        padding: 8px;
+        /*position: absolute;*/
+        right: 10px; /* Positioning 10px from the right */
     }
+
 </style>
 {% endblock %}
