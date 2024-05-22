@@ -11,6 +11,12 @@
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
+    {% if load_colour_picker %}
+    <!-- Colour Picker -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/coloris.css') }}"/>
+    <script src="{{ url_for('static', filename='js/coloris.js') }}"></script>
+    {% endif %}
+
     <title>{% block title %} {% endblock %}</title>
 </head>
 <body>

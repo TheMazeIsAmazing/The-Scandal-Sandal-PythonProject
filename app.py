@@ -210,6 +210,9 @@ def delete(id):
 def about():
     return render_template('about.html')
 
+@app.route('/developers/creator')
+def iframe_creator():
+    return render_template('iframe_creator.html', load_colour_picker=True, company="hyundai")
 
 @app.route('/api')
 def api():
@@ -252,49 +255,59 @@ def api():
         return jsonify(car_brand_scores)
 
 
+
+@app.route('/api/integration/', defaults={'company': None})
 @app.route('/api/integration/<company>')
 def integration(company):
-    conn = get_db_connection()
-    articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
-                            (company.lower(),)).fetchall()
-    conn.close()
+    if company:
+        conn = get_db_connection()
+        articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
+                                (company.lower(),)).fetchall()
+        conn.close()
 
-    car_brand_score = {}
+        car_brand_score = {}
 
-    articles_list = [dict(article) for article in articles]
+        articles_list = [dict(article) for article in articles]
 
-    for article in articles_list:
-        car_brand = article.get('company')
+        for article in articles_list:
+            car_brand = article.get('company')
 
-        if car_brand.lower() not in car_brand_score:
-            car_brand_score[car_brand] = {
-                'customer_service': [int(article.get('score_openai_customer_service'))],
-                'reliability': [int(article.get('score_openai_reliability'))],
-                'responsibility': [int(article.get('score_openai_responsibility'))]
-            }
-        else:
-            car_brand_score[car_brand]['customer_service'].append(
-                int(article.get('score_openai_customer_service')))
-            car_brand_score[car_brand]['reliability'].append(
-                int(article.get('score_openai_reliability')))
-            car_brand_score[car_brand]['responsibility'].append(
-                int(article.get('score_openai_responsibility')))
+            if car_brand.lower() not in car_brand_score:
+                car_brand_score[car_brand] = {
+                    'customer_service': [int(article.get('score_openai_customer_service'))],
+                    'reliability': [int(article.get('score_openai_reliability'))],
+                    'responsibility': [int(article.get('score_openai_responsibility'))]
+                }
+            else:
+                car_brand_score[car_brand]['customer_service'].append(
+                    int(article.get('score_openai_customer_service')))
+                car_brand_score[car_brand]['reliability'].append(
+                    int(article.get('score_openai_reliability')))
+                car_brand_score[car_brand]['responsibility'].append(
+                    int(article.get('score_openai_responsibility')))
 
-    for car_brand, scores in car_brand_score.items():
-        for category in scores:
-            scores[category] = mean(scores[category])
+        for car_brand, scores in car_brand_score.items():
+            for category in scores:
+                scores[category] = mean(scores[category])
 
-    return render_template('iframe.html',
-                           company=company,
-                           customer_service=car_brand_score[car_brand]['customer_service'],
-                           reliability=car_brand_score[car_brand]['reliability'],
-                           responsibility=car_brand_score[car_brand]['responsibility'],
-                           average=round(mean([car_brand_score[car_brand]['customer_service'],
-                                               car_brand_score[car_brand]['reliability'],
-                                               car_brand_score[car_brand]['responsibility']
-                                        ]))
-                           )
-
+        return render_template('iframe.html',
+                               company=company,
+                               customer_service=car_brand_score[car_brand]['customer_service'],
+                               reliability=car_brand_score[car_brand]['reliability'],
+                               responsibility=car_brand_score[car_brand]['responsibility'],
+                               average=round(mean([car_brand_score[car_brand]['customer_service'],
+                                                   car_brand_score[car_brand]['reliability'],
+                                                   car_brand_score[car_brand]['responsibility']
+                                            ]))
+                               )
+    else:
+        return render_template('iframe.html',
+                               company='Score preview',
+                               customer_service=1,
+                               reliability=0,
+                               responsibility=2,
+                               average=1
+                               )
 
 @app.errorhandler(404)
 def page_not_found(e):

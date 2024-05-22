@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Iframe creator {% endblock %}</h1>
+    {% include 'iframe.html' with context %}
+    <hr>
+    <label for="color-bg">Background Color</label>
+    <input id="color-bg" type="text" data-coloris>
+    <label for="color-container">Container Color</label>
+    <input id="color-container" type="text" data-coloris>
+    <label for="color-border">Border Color</label>
+    <input id="color-border" type="text" data-coloris>
+    <label for="score-display">Score Display</label>
+    <select id="score-display" >
+        <option value="circle">Circle</option>
+        <option value="filled">Filled</option>
+    </select>
+    <script>
+        document.getElementById('color-bg').addEventListener('input', function() {
+            const color = this.value;
+            document.querySelector('.iframe-able').querySelector('.container').style.backgroundColor = color;
+        });
+        document.getElementById('color-container').addEventListener('input', function() {
+            const color = this.value;
+            document.querySelector('.iframe-able .inner-container').style.backgroundColor = color;
+        });
+        document.getElementById('color-border').addEventListener('input', function() {
+            const color = this.value;
+            document.querySelector('.iframe-able .inner-container').style.borderColor = color;
+        });
+    </script>
+{% endblock %}
