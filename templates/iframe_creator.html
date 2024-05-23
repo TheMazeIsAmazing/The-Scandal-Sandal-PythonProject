@@ -21,8 +21,8 @@
         <div class="mb-3">
             <label for="score-display" class="form-label">Score Display</label>
             <select id="score-display" class="form-select">
-                <option value="circle">Circle</option>
-                <option value="filled">Filled</option>
+                <option value="scores-unfilled">Circle</option>
+                <option value="scores-filled">Filled</option>
             </select>
         </div>
         <div class="mb-3">
@@ -38,131 +38,122 @@
     <button class="btn btn-primary" onclick="copy()">Copy text</button>
 </div>
 <script>
+    // Initial JSON object with default values
     let jsonObject = {
-        "colorBg": "rgb(255, 255, 255)",
-        "colorContainer": "rgb(255, 177, 177)",
-        "colorBorder": "rgb(0, 0, 0)",
-        "scoreDisplay": "scores-unfilled",
-        "fontFamily": "Verdana"
+        colorBg: "rgb(255, 255, 255)",
+        colorContainer: "rgb(255, 177, 177)",
+        colorBorder: "rgb(0, 0, 0)",
+        scoreDisplay: "scores-unfilled",
+        fontFamily: "Verdana"
+    };
+
+    // Function to retrieve color property value from a field
+    function getColorPropertyValue(index, defaultValue) {
+        // Get the color field element
+        const clrField = document.querySelectorAll('.clr-field')[index];
+        // Retrieve the style attribute value or use default if not present
+        let colorPropertyValue = clrField.getAttribute('style') || defaultValue;
+        // Extract RGB values from the style attribute value
+        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+        // Construct and return the RGB string
+        const [red, green, blue] = rgbColor.slice(1);
+        return 'rgb(' + red + ', ' + green + ', ' + blue + ')';
     }
-    document.getElementById('color-bg').addEventListener('input', function () {
-        // Get the clr-field element
-        const clrField = document.querySelectorAll('.clr-field')[0];
 
-        // Get the style attribute value
-        let colorPropertyValue = clrField.getAttribute('style');
+    // Function to update color-related properties
+    function updateColor(property, selector, index) {
+        // Retrieve the new RGB value for the property
+        const rawRgbString = getColorPropertyValue(index, property);
+        // Apply the new color to the specified selector
+        document.querySelector(selector).style.backgroundColor = rawRgbString;
+        // Update the corresponding property in the JSON object
+        jsonObject[property] = rawRgbString;
+        // Update the copyable iframe code
+        updateCopyable();
+    }
 
-        // Check if colorPropertyValue is empty or undefined
-        if (!colorPropertyValue || colorPropertyValue === '') {
-            // Use default RGB value
-            colorPropertyValue = 'rgb(255, 255, 255)';
-        }
+    // Function to update score display property
+    function updateScoreDisplay() {
+        // Get the selected value for score display
+        const value = document.getElementById('score-display').value;
+        // Get the scores container element
+        const scoresContainer = document.querySelector('.scores-container');
+        // Remove existing score display classes
+        scoresContainer.classList.remove('scores-filled', 'scores-unfilled');
+        // Add the appropriate score display class
+        scoresContainer.classList.add(value);
+        // Update the score display property in the JSON object
+        jsonObject.scoreDisplay = value;
+        // Update the copyable iframe code
+        updateCopyable();
+    }
 
-        // Parse the color property value to extract the RGB values
-        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+    // Function to update font family property
+    function updateFontFamily() {
+        // Get the selected font family value or use Verdana as default
+        const font = document.getElementById('font-family').value || 'Verdana';
+        // Apply the selected font family to the document
+        document.documentElement.style.setProperty('--base-font-family', font);
+        // Update the font family property in the JSON object
+        jsonObject.fontFamily = font;
+        // Update the copyable iframe code
+        updateCopyable();
+    }
 
-        // Extracted RGB values
-        const red = rgbColor[1];
-        const green = rgbColor[2];
-        const blue = rgbColor[3];
-
-        // Construct the raw RGB string
-        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
-        document.querySelector('.iframe-able').style.backgroundColor = rawRgbString;
-        jsonObject.colorBg = rawRgbString
-        updateCopyable()
-    });
-    document.getElementById('color-container').addEventListener('input', function () {
-        // Get the clr-field element
-        const clrField = document.querySelectorAll('.clr-field')[1];
-
-        // Get the style attribute value
-        let colorPropertyValue = clrField.getAttribute('style');
-
-        // Check if colorPropertyValue is empty or undefined
-        if (!colorPropertyValue || colorPropertyValue === '') {
-            // Use default RGB value
-            colorPropertyValue = 'rgb(255, 177, 177)';
-        }
-
-        // Parse the color property value to extract the RGB values
-        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
-
-        // Extracted RGB values
-        const red = rgbColor[1];
-        const green = rgbColor[2];
-        const blue = rgbColor[3];
-
-        // Construct the raw RGB string
-        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
-        document.querySelector('.iframe-able .inner-container').style.backgroundColor = rawRgbString;
-        jsonObject.colorContainer = rawRgbString
-        updateCopyable()
-    });
-    document.getElementById('color-border').addEventListener('input', function () {
-        // Get the clr-field element
-        const clrField = document.querySelectorAll('.clr-field')[2];
-
-        // Get the style attribute value
-        let colorPropertyValue = clrField.getAttribute('style');
-
-        // Check if colorPropertyValue is empty or undefined
-        if (!colorPropertyValue || colorPropertyValue === '') {
-            // Use default RGB value
-            colorPropertyValue = 'rgb(0, 0, 0)';
-        }
-
-        // Parse the color property value to extract the RGB values
-        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
-
-        // Extracted RGB values
-        const red = rgbColor[1];
-        const green = rgbColor[2];
-        const blue = rgbColor[3];
-
-        // Construct the raw RGB string
-        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
-        document.documentElement.style.setProperty('--border-color', rawRgbString);
-        jsonObject.colorBorder = rawRgbString
-        updateCopyable()
-    });
-    document.getElementById('score-display').addEventListener('change', function () {
-        const value = this.value;
-        if (value === 'circle') {
-            document.querySelector('.scores-container').classList.remove('scores-filled');
-            document.querySelector('.scores-container').classList.add('scores-unfilled');
-            jsonObject.scoreDisplay = "scores-unfilled"
-        } else {
-            document.querySelector('.scores-container').classList.remove('scores-unfilled');
-            document.querySelector('.scores-container').classList.add('scores-filled');
-            jsonObject.scoreDisplay = "scores-filled"
-        }
-        updateCopyable()
-    });
-    document.getElementById('font-family').addEventListener('input', function () {
-        const font = this.value;
-        if (font !== '' && font) {
-            document.documentElement.style.setProperty('--base-font-family', font);
-            jsonObject.fontFamily = font
-        } else {
-            jsonObject.fontFamily = 'Verdana'
-        }
-        updateCopyable()
-    });
-
+    // Function to update the copyable iframe code
     function updateCopyable() {
-        document.getElementById('iframe-dom').innerText = `<iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=${jsonObject.colorBg}&color-container=${jsonObject.colorContainer}&border-color=${jsonObject.colorBorder}&score-display=${jsonObject.scoreDisplay}&font-family=${jsonObject.fontFamily}"></iframe>`
+        // Generate the iframe code with updated JSON properties
+        document.getElementById('iframe-dom').innerText = `<iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=${jsonObject.colorBg}&color-container=${jsonObject.colorContainer}&border-color=${jsonObject.colorBorder}&score-display=${jsonObject.scoreDisplay}&font-family=${jsonObject.fontFamily}"></iframe>`;
     }
 
+    // Function to copy the iframe code to clipboard
     function copy() {
-        // Get the text field
+        // Get the copyable iframe code element
         const copyText = document.getElementById("iframe-dom");
-
-        // Copy the text inside the text field
-        navigator.clipboard.writeText(copyText.value);
-
-        // Alert the copied text
-        alert("Copied the text: " + copyText.value);
+        // Copy the iframe code to clipboard
+        navigator.clipboard.writeText(copyText.innerText);
+        // Alert the user about the copied text
+        alert("Copied the text: " + copyText.innerText);
     }
+
+    // Function to update the border color property
+function updateBorderColor() {
+    // Get the clr-field element
+    const clrField = document.querySelectorAll('.clr-field')[2];
+
+    // Get the style attribute value
+    let colorPropertyValue = clrField.getAttribute('style');
+
+    // Check if colorPropertyValue is empty or undefined
+    if (!colorPropertyValue || colorPropertyValue === '') {
+        // Use default RGB value
+        colorPropertyValue = 'rgb(0, 0, 0)';
+    }
+
+    // Parse the color property value to extract the RGB values
+    const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+
+    // Extracted RGB values
+    const [red, green, blue] = rgbColor.slice(1);
+
+    // Construct the raw RGB string
+    const rawRgbString = `rgb(${red}, ${green}, ${blue})`;
+
+    // Apply the border color to the document
+    document.documentElement.style.setProperty('--border-color', rawRgbString);
+
+    // Update the border color property in the JSON object
+    jsonObject.colorBorder = rawRgbString;
+
+    // Update the copyable iframe code
+    updateCopyable();
+}
+
+    // Event listeners for input changes
+    document.getElementById('color-bg').addEventListener('input', () => updateColor('colorBg', '.iframe-able', 0));
+    document.getElementById('color-container').addEventListener('input', () => updateColor('colorContainer', '.iframe-able .inner-container', 1));
+    document.getElementById('score-display').addEventListener('change', updateScoreDisplay);
+    document.getElementById('font-family').addEventListener('input', updateFontFamily);
+    document.getElementById('color-border').addEventListener('input', updateBorderColor);
 </script>
 {% endblock %}
