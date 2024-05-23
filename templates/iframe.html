@@ -3,7 +3,7 @@
     <div class="container">
         <div class="inner-container">
             <img class="side-img" src="{{ url_for('static', filename='images/icon.png') }}">
-            <div class="scores-container scores-unfilled">
+            <div class="scores-container {{ score_display|default('scores-unfilled') }}">
                 <div class="scores">
                     <h1>{% block title %} {{ company.title() }} {% endblock %}</h1>
                 </div>
@@ -57,13 +57,13 @@
         --color-score-0: darkred;
         --color-score-1: orangered;
         --color-score-2: darkgreen;
-        --border-color: black;
-        --base-font-family: Verdana;
+        --border-color: {{ border_color|default('black') }};
+        --base-font-family: {{ font_family|default('Verdana') }};
         font-size: 16px;
     }
 
     .iframe-able {
-        background-color: white;
+        background-color: {{ color_bg|default('white') }};
     }
 
     .iframe-able * {
@@ -96,7 +96,7 @@
         padding: 10px;
         align-items: center;
         justify-content: space-between;
-        background-color: rosybrown;
+        background-color: {{ color_container|default('rosybrown') }};
         border: 1px solid var(--border-color);
         border-radius: 10px;
     }

@@ -207,14 +207,17 @@ def delete(id):
 
 
 @app.route('/about')
+@app.route('/about/')
 def about():
     return render_template('about.html')
 
 @app.route('/developers/creator')
+@app.route('/developers/creator/')
 def iframe_creator():
     return render_template('iframe_creator.html', load_colour_picker=True, company="Score preview")
 
 @app.route('/api')
+@app.route('/api/')
 def api():
     conn = get_db_connection()
     articles = conn.execute('SELECT * FROM articles').fetchall()
@@ -256,9 +259,15 @@ def api():
 
 
 
-@app.route('/api/integration/', defaults={'company': None})
+@app.route('/api/integration/')
 @app.route('/api/integration/<company>')
 def integration(company):
+    color_bg = request.args.get('color-bg', 'white')
+    color_container = request.args.get('color-container', 'rosybrown')
+    border_color = request.args.get('border-color', 'black')
+    score_display = request.args.get('score-display', 'scores-unfilled')
+    font_family = request.args.get('font-family', 'Verdana')
+
     if company:
         conn = get_db_connection()
         articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
@@ -294,10 +303,22 @@ def integration(company):
                                company=company,
                                customer_service=car_brand_score[car_brand]['customer_service'],
                                reliability=car_brand_score[car_brand]['reliability'],
-                               responsibility=car_brand_score[car_brand]['responsibility']
+                               responsibility=car_brand_score[car_brand]['responsibility'],
+                               color_bg=color_bg,
+                               color_container=color_container,
+                               border_color=border_color,
+                               score_display=score_display,
+                               font_family=font_family,
                                )
     else:
-        return render_template('iframe.html', company='Score preview')
+        return render_template('iframe.html',
+                               company='Score preview',
+                               color_bg=color_bg,
+                               color_container=color_container,
+                               border_color=border_color,
+                               score_display=score_display,
+                               font_family=font_family,
+                               )
 
 @app.errorhandler(404)
 def page_not_found(e):

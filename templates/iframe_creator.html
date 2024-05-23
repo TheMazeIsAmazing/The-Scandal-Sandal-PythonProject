@@ -1,48 +1,168 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Iframe creator {% endblock %}</h1>
+<div class="container my-4">
+    <h1 class="mb-4">{% block title %} Iframe creator {% endblock %}</h1>
     {% include 'iframe.html' with context %}
     <hr>
-    <label for="color-bg">Iframe Background Color</label>
-    <input id="color-bg" type="text" data-coloris>
-    <label for="color-container">Background Color</label>
-    <input id="color-container" type="text" data-coloris>
-    <label for="color-border">Border Color</label>
-    <input id="color-border" type="text" data-coloris>
-    <label for="score-display">Score Display</label>
-    <select id="score-display" >
-        <option value="circle">Circle</option>
-        <option value="filled">Filled</option>
-    </select>
-    <label for="font-family">Font Family</label>
-    <input id="font-family" type="text">
-    <script>
-        document.getElementById('color-bg').addEventListener('input', function() {
-            const color = this.value;
-            document.querySelector('.iframe-able').querySelector('.container').style.backgroundColor = color;
-        });
-        document.getElementById('color-container').addEventListener('input', function() {
-            const color = this.value;
-            document.querySelector('.iframe-able .inner-container').style.backgroundColor = color;
-        });
-        document.getElementById('color-border').addEventListener('input', function() {
-            const color = this.value;
-            document.documentElement.style.setProperty('--border-color', color);
-        });
-        document.getElementById('score-display').addEventListener('change', function() {
-            const value = this.value;
-            if (value === 'circle') {
-                document.querySelector('.scores-container').classList.remove('scores-filled');
-                document.querySelector('.scores-container').classList.add('scores-unfilled');
-            } else {
-                document.querySelector('.scores-container').classList.remove('scores-unfilled');
-                document.querySelector('.scores-container').classList.add('scores-filled');
-            }
-        });
-        document.getElementById('font-family').addEventListener('input', function() {
-            const font = this.value;
+    <form>
+        <div class="mb-3">
+            <label for="color-bg" class="form-label">Iframe Background Color</label>
+            <input id="color-bg" type="text" class="form-control" data-coloris>
+        </div>
+        <div class="mb-3">
+            <label for="color-container" class="form-label">Background Color</label>
+            <input id="color-container" type="text" class="form-control" data-coloris>
+        </div>
+        <div class="mb-3">
+            <label for="color-border" class="form-label">Border Color</label>
+            <input id="color-border" type="text" class="form-control" data-coloris>
+        </div>
+        <div class="mb-3">
+            <label for="score-display" class="form-label">Score Display</label>
+            <select id="score-display" class="form-select">
+                <option value="circle">Circle</option>
+                <option value="filled">Filled</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="font-family" class="form-label">Font Family</label>
+            <input id="font-family" type="text" class="form-control">
+        </div>
+    </form>
+    <hr>
+    <div class="mb-3">
+        <label for="iframe-dom" class="form-label">Iframe Code</label>
+        <textarea id="iframe-dom" class="form-control" rows="3" disabled><iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=white&color-container=rosybrown&border-color=black&score-display=scores-unfilled&font-family=Verdana"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="copy()">Copy text</button>
+</div>
+<script>
+    let jsonObject = {
+        "colorBg": "rgb(255, 255, 255)",
+        "colorContainer": "rgb(255, 177, 177)",
+        "colorBorder": "rgb(0, 0, 0)",
+        "scoreDisplay": "scores-unfilled",
+        "fontFamily": "Verdana"
+    }
+    document.getElementById('color-bg').addEventListener('input', function () {
+        // Get the clr-field element
+        const clrField = document.querySelectorAll('.clr-field')[0];
+
+        // Get the style attribute value
+        let colorPropertyValue = clrField.getAttribute('style');
+
+        // Check if colorPropertyValue is empty or undefined
+        if (!colorPropertyValue || colorPropertyValue === '') {
+            // Use default RGB value
+            colorPropertyValue = 'rgb(255, 255, 255)';
+        }
+
+        // Parse the color property value to extract the RGB values
+        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+
+        // Extracted RGB values
+        const red = rgbColor[1];
+        const green = rgbColor[2];
+        const blue = rgbColor[3];
+
+        // Construct the raw RGB string
+        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+        document.querySelector('.iframe-able').style.backgroundColor = rawRgbString;
+        jsonObject.colorBg = rawRgbString
+        updateCopyable()
+    });
+    document.getElementById('color-container').addEventListener('input', function () {
+        // Get the clr-field element
+        const clrField = document.querySelectorAll('.clr-field')[1];
+
+        // Get the style attribute value
+        let colorPropertyValue = clrField.getAttribute('style');
+
+        // Check if colorPropertyValue is empty or undefined
+        if (!colorPropertyValue || colorPropertyValue === '') {
+            // Use default RGB value
+            colorPropertyValue = 'rgb(255, 177, 177)';
+        }
+
+        // Parse the color property value to extract the RGB values
+        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+
+        // Extracted RGB values
+        const red = rgbColor[1];
+        const green = rgbColor[2];
+        const blue = rgbColor[3];
+
+        // Construct the raw RGB string
+        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+        document.querySelector('.iframe-able .inner-container').style.backgroundColor = rawRgbString;
+        jsonObject.colorContainer = rawRgbString
+        updateCopyable()
+    });
+    document.getElementById('color-border').addEventListener('input', function () {
+        // Get the clr-field element
+        const clrField = document.querySelectorAll('.clr-field')[2];
+
+        // Get the style attribute value
+        let colorPropertyValue = clrField.getAttribute('style');
+
+        // Check if colorPropertyValue is empty or undefined
+        if (!colorPropertyValue || colorPropertyValue === '') {
+            // Use default RGB value
+            colorPropertyValue = 'rgb(0, 0, 0)';
+        }
+
+        // Parse the color property value to extract the RGB values
+        const rgbColor = colorPropertyValue.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+
+        // Extracted RGB values
+        const red = rgbColor[1];
+        const green = rgbColor[2];
+        const blue = rgbColor[3];
+
+        // Construct the raw RGB string
+        const rawRgbString = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+        document.documentElement.style.setProperty('--border-color', rawRgbString);
+        jsonObject.colorBorder = rawRgbString
+        updateCopyable()
+    });
+    document.getElementById('score-display').addEventListener('change', function () {
+        const value = this.value;
+        if (value === 'circle') {
+            document.querySelector('.scores-container').classList.remove('scores-filled');
+            document.querySelector('.scores-container').classList.add('scores-unfilled');
+            jsonObject.scoreDisplay = "scores-unfilled"
+        } else {
+            document.querySelector('.scores-container').classList.remove('scores-unfilled');
+            document.querySelector('.scores-container').classList.add('scores-filled');
+            jsonObject.scoreDisplay = "scores-filled"
+        }
+        updateCopyable()
+    });
+    document.getElementById('font-family').addEventListener('input', function () {
+        const font = this.value;
+        if (font !== '' && font) {
             document.documentElement.style.setProperty('--base-font-family', font);
-        });
-    </script>
+            jsonObject.fontFamily = font
+        } else {
+            jsonObject.fontFamily = 'Verdana'
+        }
+        updateCopyable()
+    });
+
+    function updateCopyable() {
+        document.getElementById('iframe-dom').innerText = `<iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=${jsonObject.colorBg}&color-container=${jsonObject.colorContainer}&border-color=${jsonObject.colorBorder}&score-display=${jsonObject.scoreDisplay}&font-family=${jsonObject.fontFamily}"></iframe>`
+    }
+
+    function copy() {
+        // Get the text field
+        const copyText = document.getElementById("iframe-dom");
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+
+        // Alert the copied text
+        alert("Copied the text: " + copyText.value);
+    }
+</script>
 {% endblock %}
