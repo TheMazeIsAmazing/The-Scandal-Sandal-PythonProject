@@ -3,49 +3,48 @@
     <div class="container">
         <div class="inner-container">
             <img class="side-img" src="{{ url_for('static', filename='images/icon.png') }}">
-            <div class="scores-container">
+            <div class="scores-container scores-unfilled">
                 <div class="scores">
                     <h1>{% block title %} {{ company.title() }} {% endblock %}</h1>
-                    <div class="score">Average: {{ average }}</div>
                 </div>
                 <div class="scores">
-                    {% if customer_service == 1 %}
-                    <div class="score scores1">Customer Service and Care
-                        <div id="customer-service-score"></div>
+                    {% if customer_service == 0 %}
+                    <div class="score scores0">Customer Service and Care
+                        <div class="score-circle"></div>
                     </div>
                     {% elif customer_service == 2 %}
                     <div class="score scores2">Customer Service and Care
-                        <div id="customer-service-score"></div>
+                        <div class="score-circle"></div>
                     </div>
                     {% else %}
-                    <div class="score scores0">Customer Service and Care
-                        <div id="customer-service-score"></div>
+                    <div class="score scores1">Customer Service and Care
+                        <div class="score-circle"></div>
                     </div>
                     {% endif %}
                     {% if reliability == 1 %}
                     <div class="score scores1">(Software) Reliability
-                        <div id="reliability-score"></div>
+                        <div class="score-circle"></div>
                     </div>
-                    {% elif reliability == 2 %}
-                    <div class="score scores2">(Software) Reliability
-                        <div id="reliability-score"></div>
+                    {% elif reliability == 0 %}
+                    <div class="score scores0">(Software) Reliability
+                        <div class="score-circle"></div>
                     </div>
                     {% else %}
-                    <div class="score scores0">(Software) Reliability
-                        <div id="reliability-score"></div>
+                    <div class="score scores2">(Software) Reliability
+                        <div class="score-circle"></div>
                     </div>
                     {% endif %}
                     {% if responsibility == 1 %}
                     <div class="score scores1">Responsibility
-                        <div id="responsibility-score"></div>
+                        <div class="score-circle"></div>
                     </div>
                     {% elif responsibility == 2 %}
                     <div class="score scores2">Responsibility
-                        <div id="responsibility-score"></div>
+                        <div class="score-circle"></div>
                     </div>
                     {% else %}
                     <div class="score scores0">Responsibility
-                        <div id="responsibility-score"></div>
+                        <div class="score-circle"></div>
                     </div>
                     {% endif %}
                 </div>
@@ -54,20 +53,29 @@
     </div>
 </div>
 <style>
+    :root {
+        --color-score-0: darkred;
+        --color-score-1: orangered;
+        --color-score-2: darkgreen;
+        --border-color: black;
+        --base-font-family: Verdana;
+        font-size: 16px;
+    }
+
     .iframe-able {
-        background-color: chartreuse;
+        background-color: white;
     }
 
     .iframe-able * {
         margin: 0;
-        font-family: Verdana;
-        font-size: 10px;
+        font-family: var(--base-font-family);
+        font-size: 0.8rem;
         font-weight: bold;
     }
 
     .iframe-able h1 {
         font-family: Magneto;
-        font-size: 20px;
+        font-size: 1.5rem;
     }
 
     .iframe-able .side-img {
@@ -89,7 +97,7 @@
         align-items: center;
         justify-content: space-between;
         background-color: rosybrown;
-        border: 1px solid #000;
+        border: 1px solid var(--border-color);
         border-radius: 10px;
     }
 
@@ -102,19 +110,36 @@
         flex-wrap: wrap;
     }
 
-    .iframe-able .scores2 {
-        background-color: darkgreen !important;
+    .iframe-able .scores-filled .score-circle {
+        display: none;
+    }
+
+    .iframe-able .scores-filled .scores0 {
+        background-color: var(--color-score-0) !important;
         color: white;
     }
 
-    .iframe-able .scores1 {
-        background-color: orangered !important;
+    .iframe-able .scores-filled .scores1 {
+        background-color: var(--color-score-1) !important;
     }
 
-    .iframe-able .scores0 {
-        background-color: darkred !important;
+    .iframe-able .scores-filled .scores2 {
+        background-color: var(--color-score-2) !important;
         color: white;
     }
+
+    .iframe-able .scores-unfilled .scores0 .score-circle {
+        background-color: var(--color-score-0) !important;
+    }
+
+    .iframe-able .scores-unfilled .scores1 .score-circle {
+        background-color: var(--color-score-1) !important;
+    }
+
+    .iframe-able .scores-unfilled .scores2 .score-circle {
+        background-color: var(--color-score-2) !important;
+    }
+
 
     .iframe-able .scores-container {
         display: flex;
@@ -124,25 +149,39 @@
     }
 
     .iframe-able .scores .score {
-        position: relative;
         background-color: white;
-        border: 1px solid #000;
+        border: 1px solid var(--border-color);
         border-radius: 10px;
         padding: 10px;
         flex: 1;
-        text-align: left;
         display: flex;
         align-items: center;
+        gap: 5px;
         justify-content: space-between;
     }
 
-    .iframe-able .scores .score div {
+    .score-circle {
         background-color: white;
-        border: 1px solid #000;
-        border-radius: 15px;
-        padding: 8px;
-        /*position: absolute;*/
-        right: 10px; /* Positioning 10px from the right */
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 10px;
+    }
+
+    @media (max-width: 600px) {
+        .iframe-able .inner-container {
+            flex-direction: column;
+        }
+
+        .iframe-able .side-img {
+            width: 30%;
+            max-width: 80px;
+        }
+    }
+
+    @media (max-width: 475px) {
+        .iframe-able .scores {
+            flex-direction: column;
+        }
     }
 
 </style>

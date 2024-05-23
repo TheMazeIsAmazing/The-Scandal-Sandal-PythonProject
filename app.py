@@ -212,7 +212,7 @@ def about():
 
 @app.route('/developers/creator')
 def iframe_creator():
-    return render_template('iframe_creator.html', load_colour_picker=True, company="hyundai")
+    return render_template('iframe_creator.html', load_colour_picker=True, company="Score preview")
 
 @app.route('/api')
 def api():
@@ -294,20 +294,10 @@ def integration(company):
                                company=company,
                                customer_service=car_brand_score[car_brand]['customer_service'],
                                reliability=car_brand_score[car_brand]['reliability'],
-                               responsibility=car_brand_score[car_brand]['responsibility'],
-                               average=round(mean([car_brand_score[car_brand]['customer_service'],
-                                                   car_brand_score[car_brand]['reliability'],
-                                                   car_brand_score[car_brand]['responsibility']
-                                            ]))
+                               responsibility=car_brand_score[car_brand]['responsibility']
                                )
     else:
-        return render_template('iframe.html',
-                               company='Score preview',
-                               customer_service=1,
-                               reliability=0,
-                               responsibility=2,
-                               average=1
-                               )
+        return render_template('iframe.html', company='Score preview')
 
 @app.errorhandler(404)
 def page_not_found(e):
