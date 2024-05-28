@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 import os
 import json
 
-
 # Load the .env file
 load_dotenv()
 
@@ -194,10 +193,6 @@ def edit(id):
             return redirect(url_for('index'))
 
     return render_template('edit.html', post=post)
-
-@app.route('/.well-known/acme-challenge/F0ld4f6TxbbhyhOn5zGuFLtixm3Eh_HZh41wznqdRHA')
-def challenge():
-    return 'F0ld4f6TxbbhyhOn5zGuFLtixm3Eh_HZh41wznqdRHA.sT9OvxlWnBP6JdzUc1dPhO3s64YjJqNFXuec4e_2HJg'
 
 
 @app.route('/<int:id>/delete', methods=('POST',))
