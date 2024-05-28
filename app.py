@@ -9,7 +9,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import json
-from waitress import serve
+
 
 # Load the .env file
 load_dotenv()
@@ -195,6 +195,10 @@ def edit(id):
 
     return render_template('edit.html', post=post)
 
+@app.route('/.well-known/acme-challenge/F0ld4f6TxbbhyhOn5zGuFLtixm3Eh_HZh41wznqdRHA')
+def challenge():
+    return 'F0ld4f6TxbbhyhOn5zGuFLtixm3Eh_HZh41wznqdRHA.sT9OvxlWnBP6JdzUc1dPhO3s64YjJqNFXuec4e_2HJg'
+
 
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
@@ -327,4 +331,4 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
-    serve(app, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0')
