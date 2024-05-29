@@ -20,43 +20,29 @@ client = OpenAI(
     api_key=os.getenv('OPENAI_API_KEY'),
 )
 
-
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def get_post(post_id):
-    conn = get_db_connection()
-    post = conn.execute('SELECT * FROM articles WHERE id = ?',
-                        (post_id,)).fetchone()
-    conn.close()
-    if post is None:
-        abort(404)
-    return post
-
-
 app = Flask(__name__,
             static_url_path='',
             static_folder='static',
             template_folder='templates')
 
+app.url_map.strict_slashes = False
 app.config['SECRET_KEY'] = 'your secret key'
 
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
 
 @app.route('/')
 def index():
     conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM articles').fetchall()
+    articles = conn.execute('SELECT * FROM articles').fetchall()
     conn.close()
-    return render_template('index.html', posts=posts)
+    return render_template('index.html', articles=articles)
 
 
-@app.route('/articles/<int:post_id>')
-def post(post_id):
-    post = get_post(post_id)
-    return render_template('post.html', post=post)
+@app.route('/articles/<int:article_id>')
+def article(article_id):
+    article = get_article(article_id)
+    return render_template('article.html', article=article)
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -175,49 +161,65 @@ def create():
 
 @app.route('/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
-    post = get_post(id)
+    article = get_article(id)
 
     if request.method == 'POST':
-        title = request.form['title']
+        headline = request.form['headline']
         content = request.form['content']
+        url = request.form['url']
+        company = request.form['company']
+        score_openai_customer_service = request.form['score_openai_customer_service']
+        ex_score_openai_customer_service = request.form['ex_score_openai_customer_service']
+        score_openai_reliability = request.form['score_openai_reliability']
+        ex_score_openai_reliability = request.form['ex_score_openai_reliability']
+        score_openai_responsibility = request.form['score_openai_responsibility']
+        ex_score_openai_responsibility = request.form['ex_score_openai_responsibility']
 
-        if not title:
-            flash('Title is required!')
+        # company, url, headline, content, score_openai_customer_service, ex_score_openai_customer_service,
+        # score_openai_reliability, ex_score_openai_reliability, score_openai_responsibility, ex_score_openai_responsibility
+
+        if not headline:
+            flash('Headline is required!')
+        if not content:
+            flash('Content is required!')
+        if not url:
+            flash('URL is required!')
+        if not company:
+            flash('Company is required!')
         else:
             conn = get_db_connection()
-            conn.execute('UPDATE posts SET title = ?, content = ?'
+            conn.execute('UPDATE articles SET company = ?, url = ?, headline = ?, content = ?, score_openai_customer_service = ?, ex_score_openai_customer_service = ?, score_openai_reliability = ?, ex_score_openai_reliability = ?, score_openai_responsibility = ?, ex_score_openai_responsibility = ?'
                          ' WHERE id = ?',
-                         (title, content, id))
+                         (company, url, headline, content, score_openai_customer_service, ex_score_openai_customer_service, score_openai_reliability, ex_score_openai_reliability, score_openai_responsibility, ex_score_openai_responsibility, id))
             conn.commit()
             conn.close()
             return redirect(url_for('index'))
 
-    return render_template('edit.html', post=post)
+    return render_template('edit.html', article=article)
 
 
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
-    post = get_post(id)
+    article = get_article(id)
     conn = get_db_connection()
     conn.execute('DELETE FROM articles WHERE id = ?', (id,))
     conn.commit()
     conn.close()
-    flash('"{}" was successfully deleted!'.format(post['headline']))
+    flash('"{}" was successfully deleted!'.format(article['headline']))
     return redirect(url_for('index'))
 
 
 @app.route('/about')
-@app.route('/about/')
 def about():
     return render_template('about.html')
 
+
 @app.route('/developers/creator')
-@app.route('/developers/creator/')
 def iframe_creator():
     return render_template('iframe_creator.html', load_colour_picker=True, company="Score preview")
 
+
 @app.route('/api')
-@app.route('/api/')
 def api():
     conn = get_db_connection()
     articles = conn.execute('SELECT * FROM articles').fetchall()
@@ -256,7 +258,6 @@ def api():
     else:
         # If the request doesn't specify a preference, or prefers JSON, return JSON
         return jsonify(car_brand_scores)
-
 
 
 @app.route('/api/integration/')
@@ -320,10 +321,23 @@ def integration(company):
                                font_family=font_family,
                                )
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
 
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def get_article(article_id):
+    conn = get_db_connection()
+    article = conn.execute('SELECT * FROM articles WHERE id = ?',
+                        (article_id,)).fetchone()
+    conn.close()
+    if article is None:
+        abort(404)
+    return article

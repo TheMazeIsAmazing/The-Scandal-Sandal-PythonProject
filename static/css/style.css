@@ -1,6 +1,87 @@
-h1 {
-    border: 2px #eee solid;
-    color: brown;
-    text-align: center;
+:root {
+    --color-score-0: darkred;
+    --color-score-1: orangered;
+    --color-score-2: darkgreen;
+    --primary: #A5051F;
+    --secondary: #25a18e
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    filter: brightness(85%);
+}
+
+.badge-primary {
+    background-color: var(--primary) !important;
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    filter: brightness(85%);
+}
+
+.badge-secondary {
+    background-color: var(--secondary) !important;
+}
+
+.traffic-light-radio {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background: #444444;
     padding: 10px;
+    max-width: 200px;
+    justify-content: center;
+    vertical-align: center;
+    border-radius: 10px;
+    margin-bottom: .5rem;
+}
+
+.traffic-light-radio input[type="radio"] {
+    display: none;
+}
+
+.traffic-light-radio label {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid white;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.traffic-light-radio label.red {
+    background-color: var(--color-score-0)
+}
+
+.traffic-light-radio label.yellow {
+    background-color: var(--color-score-1)
+}
+
+.traffic-light-radio label.green {
+    background-color: var(--color-score-2)
+}
+
+.traffic-light-radio input[type="radio"]:checked + label.red,
+.traffic-light-radio input[type="radio"]:checked + label.yellow,
+.traffic-light-radio input[type="radio"]:checked + label.green {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+.scandal-logo {
+    max-width: 250px;
+    margin-top: -5px;
 }

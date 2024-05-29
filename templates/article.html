@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %} {{ article['headline'] }} {% endblock %}</h2>
+    <span class="badge badge-primary">{{ article['created'] }}</span>
+    <p>{{ article['content'] }}</p>
+    <p><b>Customer Service and Care:</b> {{ article['score_openai_customer_service'] }}</p>
+    <p>{{ article['ex_score_openai_customer_service'] }}</p>
+    <p><b>(Software) Reliability:</b> {{ article['score_openai_reliability'] }}</p>
+    <p>{{ article['ex_score_openai_reliability'] }}</p>
+    <p><b>Responsibility:</b> {{ article['score_openai_responsibility'] }}</p>
+    <p>{{ article['ex_score_openai_responsibility'] }}</p>
+
+{% endblock %}

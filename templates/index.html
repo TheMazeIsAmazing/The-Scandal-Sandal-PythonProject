@@ -2,19 +2,14 @@
 
 {% block content %}
     <h1>{% block title %} Welcome {% endblock %}</h1>
-    {% for post in posts %}
-        <a href="{{ url_for('post', post_id=post['id']) }}">
-            <h2>{{ post['headline'] }}</h2>
+    {% for article in articles %}
+        <a href="{{ url_for('article', article_id=article['id']) }}">
+            <h2>{{ article['headline'] }}</h2>
         </a>
-        <span class="badge badge-primary">{{ post['created'] }}</span>
-        <a href="{{ url_for('edit', id=post['id']) }}">
+        <span class="badge badge-primary">{{ article['created'] }}</span>
+        <a href="{{ url_for('edit', id=article['id']) }}">
             <span class="badge badge-warning">Edit</span>
         </a>
-        <form action="{{ url_for('delete', id=post['id']) }}" method="POST">
-            <input type="submit" value="Delete Post"
-                    class="btn btn-danger btn-sm"
-                    onclick="return confirm('Are you sure you want to delete this post?')">
-        </form>
         <hr>
     {% endfor %}
 {% endblock %}

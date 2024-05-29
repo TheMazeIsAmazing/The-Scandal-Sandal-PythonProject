@@ -11,6 +11,7 @@
 
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
     {% if load_colour_picker %}
     <!-- Colour Picker -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/coloris.css') }}"/>
@@ -22,7 +23,7 @@
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-light">
     <a class="navbar-brand" href="{{ url_for('index')}}">
-        <img alt="The Scandal Sandal" src="{{ url_for('static', filename='images/logo.png') }}" style="max-width: 250px; margin-top: -5px">
+        <img class="scandal-logo" alt="The Scandal Sandal" src="{{ url_for('static', filename='images/logo.png') }}">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
