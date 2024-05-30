@@ -161,3 +161,12 @@ cython_debug/
 
 # Databases
 database.db
+
+# Vps stuff
+bin/
+[16
+[64
+lib64/
+nohup.out
+pyvenv.cfg
+See
