@@ -85,3 +85,11 @@
     max-width: 250px;
     margin-top: -5px;
 }
+
+a h2 {
+    color: #500d0d;
+}
+
+a h2:hover {
+    color: #381d1d;
+}

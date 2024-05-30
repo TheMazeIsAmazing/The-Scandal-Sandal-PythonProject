@@ -22,3 +22,11 @@ CREATE TABLE articles (
     score_openai_responsibility SMALLINT NOT NULL,
     ex_score_openai_responsibility TEXT NOT NULL
 );
+
+CREATE TABLE accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL
+);

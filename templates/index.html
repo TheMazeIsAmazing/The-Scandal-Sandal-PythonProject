@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Welcome {% endblock %}</h1>
+    <h1>{% block title %} Welcome back, {{ username }}! {% endblock %}</h1>
     {% for article in articles %}
         <a href="{{ url_for('article', article_id=article['id']) }}">
             <h2>{{ article['headline'] }}</h2>

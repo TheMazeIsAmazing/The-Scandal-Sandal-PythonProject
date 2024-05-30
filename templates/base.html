@@ -18,11 +18,11 @@
     <script src="{{ url_for('static', filename='js/coloris.js') }}"></script>
     {% endif %}
 
-    <title>{% block title %} {% endblock %}</title>
+    <title>{% block title %} {% endblock %} | The Scandal Sandal</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-light bg-light">
-    <a class="navbar-brand" href="{{ url_for('index')}}">
+    <a class="navbar-brand" href="{{ url_for('home')}}">
         <img class="scandal-logo" alt="The Scandal Sandal" src="{{ url_for('static', filename='images/logo.png') }}">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -34,10 +34,24 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{url_for('about')}}">About</a>
             </li>
+            {% if session['logged_in'] %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('index')}}">Articles</a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{url_for('create')}}">New Article</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('login')}}">Login</a>
+            </li>
+            {% endif %}
         </ul>
+
+
     </div>
 </nav>
 <div class="container">
