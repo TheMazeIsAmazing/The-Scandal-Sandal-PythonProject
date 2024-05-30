@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Scores {% endblock %}</h1>
+<p>Welcome to The Scandal Sandal website! Here you'll be able to find and compare multiple car manufacturers
+    with the help of a simple score. They will be grated on the following criteria:</p>
+<img style="max-width: 100%" src="{{ url_for('static', filename='images/scores.png') }}">
+{% endblock %}

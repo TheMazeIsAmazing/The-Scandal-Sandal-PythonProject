@@ -33,7 +33,7 @@
     <hr>
     <div class="mb-3">
         <label for="iframe-dom" class="form-label">Iframe Code</label>
-        <textarea id="iframe-dom" class="form-control" rows="3" disabled><iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=white&color-container=rosybrown&border-color=black&score-display=scores-unfilled&font-family=Verdana"></textarea>
+        <textarea id="iframe-dom" class="form-control" rows="3" disabled><iframe src="http://127.0.0.1:5000/api/integration/hyundai?color-bg=white&color-container=rosybrown&border-color=black&score-display=scores-unfilled&font-family=Verdana"></textarea>
     </div>
     <button class="btn btn-primary" onclick="copy()">Copy text</button>
 </div>
@@ -103,7 +103,7 @@
     // Function to update the copyable iframe code
     function updateCopyable() {
         // Generate the iframe code with updated JSON properties
-        document.getElementById('iframe-dom').innerText = `<iframe src="http://scandal-sandal.com/api/integration/hyundai?color-bg=${jsonObject.colorBg}&color-container=${jsonObject.colorContainer}&border-color=${jsonObject.colorBorder}&score-display=${jsonObject.scoreDisplay}&font-family=${jsonObject.fontFamily}"></iframe>`;
+        document.getElementById('iframe-dom').innerText = `<iframe src="http://127.0.0.1:5000/api/integration/hyundai?color-bg=${jsonObject.colorBg}&color-container=${jsonObject.colorContainer}&border-color=${jsonObject.colorBorder}&score-display=${jsonObject.scoreDisplay}&font-family=${jsonObject.fontFamily}"></iframe>`;
     }
 
     // Function to copy the iframe code to clipboard

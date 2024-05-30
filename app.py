@@ -35,14 +35,17 @@ if __name__ == "__main__":
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles').fetchall()
+    conn.close()
+    return render_template('home.html', articles=articles)
 
 
 @app.route('/articles')
 def index():
     if 'logged_in' in session:
         conn = get_db_connection()
-        articles = conn.execute('SELECT * FROM articles').fetchall()
+        articles = conn.execute('SELECT * FROM articles ORDER BY created DESC LIMIT 3').fetchall()
         conn.close()
         return render_template('index.html', articles=articles, username=session['username'])
 
@@ -133,11 +136,8 @@ def register():
 
 @app.route('/articles/<int:article_id>')
 def article(article_id):
-    if 'logged_in' in session:
-        article = get_article(article_id)
-        return render_template('article.html', article=article)
-
-    return redirect(url_for('login'))
+    db_article = get_article(article_id)
+    return render_template('article.html', article=db_article)
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -317,6 +317,10 @@ def delete(id):
 def about():
     return render_template('about.html')
 
+@app.route('/scores')
+def scores():
+    return render_template('scores.html')
+
 
 @app.route('/developers/creator')
 def iframe_creator():
@@ -379,36 +383,46 @@ def integration(company):
                                 (company.lower(),)).fetchall()
         conn.close()
 
-        car_brand_score = {}
+        if articles.__len__() != 0:
+            car_brand_score = {}
 
-        articles_list = [dict(article) for article in articles]
+            articles_list = [dict(article) for article in articles]
 
-        for article in articles_list:
-            car_brand = article.get('company')
+            for article in articles_list:
+                car_brand = article.get('company')
 
-            if car_brand.lower() not in car_brand_score:
-                car_brand_score[car_brand] = {
-                    'customer_service': [int(article.get('score_openai_customer_service'))],
-                    'reliability': [int(article.get('score_openai_reliability'))],
-                    'responsibility': [int(article.get('score_openai_responsibility'))]
-                }
-            else:
-                car_brand_score[car_brand]['customer_service'].append(
-                    int(article.get('score_openai_customer_service')))
-                car_brand_score[car_brand]['reliability'].append(
-                    int(article.get('score_openai_reliability')))
-                car_brand_score[car_brand]['responsibility'].append(
-                    int(article.get('score_openai_responsibility')))
+                if car_brand.lower() not in car_brand_score:
+                    car_brand_score[car_brand] = {
+                        'customer_service': [int(article.get('score_openai_customer_service'))],
+                        'reliability': [int(article.get('score_openai_reliability'))],
+                        'responsibility': [int(article.get('score_openai_responsibility'))]
+                    }
+                else:
+                    car_brand_score[car_brand]['customer_service'].append(
+                        int(article.get('score_openai_customer_service')))
+                    car_brand_score[car_brand]['reliability'].append(
+                        int(article.get('score_openai_reliability')))
+                    car_brand_score[car_brand]['responsibility'].append(
+                        int(article.get('score_openai_responsibility')))
 
-        for car_brand, scores in car_brand_score.items():
-            for category in scores:
-                scores[category] = mean(scores[category])
+            for car_brand, scores in car_brand_score.items():
+                for category in scores:
+                    scores[category] = mean(scores[category])
+
+            return render_template('iframe.html',
+                                   company=company,
+                                   customer_service=car_brand_score[car_brand]['customer_service'],
+                                   reliability=car_brand_score[car_brand]['reliability'],
+                                   responsibility=car_brand_score[car_brand]['responsibility'],
+                                   color_bg=color_bg,
+                                   color_container=color_container,
+                                   border_color=border_color,
+                                   score_display=score_display,
+                                   font_family=font_family,
+                                   )
 
         return render_template('iframe.html',
                                company=company,
-                               customer_service=car_brand_score[car_brand]['customer_service'],
-                               reliability=car_brand_score[car_brand]['reliability'],
-                               responsibility=car_brand_score[car_brand]['responsibility'],
                                color_bg=color_bg,
                                color_container=color_container,
                                border_color=border_color,

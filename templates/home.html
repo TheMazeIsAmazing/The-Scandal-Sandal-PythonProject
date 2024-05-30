@@ -1,6 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<header>
+    <p>Avoiding scandalous companies, <br> made easy!</p>
+</header>
+<div>
     <h1>{% block title %} Home {% endblock %}</h1>
-    <p>Lorem ipsum</p>
+    <div>
+        <p>Welcome to The Scandal Sandal website! Here you'll be able to find and compare multiple car manufacturers
+            with the help of a simple score. They will be grated on the following criteria:</p>
+        <ul>
+            <li>Customer Service and Care</li>
+            <li>(Software) Reliability</li>
+            <li>Responsibility</li>
+        </ul>
+        <p>These scores will help you make a more informed decision the next time you buy a car. Like if e.g. (Software)
+            Reliability is really important for you, The Scandal Sandal will help you view the (Software) Reliability of
+            a particular car manufacturer and the news articles that let to these scores.</p>
+
+        <div class="form-group">
+            <a href="{{ url_for('scores') }}">
+                <button class="btn btn-primary">More information about our scores</button>
+            </a>
+        </div>
+    </div>
+</div>
+<div>
+    <h2>Recent Articles</h2>
+    <div>
+        {% for article in articles %}
+        <a href="{{ url_for('article', article_id=article['id']) }}">
+            <p>{{ article['headline'] }}</p>
+        </a>
+        <span class="badge badge-primary">{{ article['created'] }}</span>
+        <hr>
+        {% endfor %}
+    </div>
+</div>
+
+
 {% endblock %}
