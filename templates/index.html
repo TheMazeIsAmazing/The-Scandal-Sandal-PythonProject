@@ -4,7 +4,7 @@
     <h1>{% block title %} Welcome back, {{ username }}! {% endblock %}</h1>
     {% for article in articles %}
         <a href="{{ url_for('article', article_id=article['id']) }}">
-            <h2>{{ article['headline'] }}</h2>
+            {{ article['headline'] }}
         </a>
         <span class="badge badge-primary">{{ article['created'] }}</span>
         <a href="{{ url_for('edit', id=article['id']) }}">
