@@ -167,6 +167,6 @@ bin/
 [16
 [64
 lib64/
-nohub.out
+nohup.out
 pyvenv.cfg
 See
