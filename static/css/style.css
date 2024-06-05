@@ -91,11 +91,11 @@
     margin-top: -5px;
 }
 
-a h2 {
+a h4 {
     color: #500d0d;
 }
 
-a h2:hover {
+a h4:hover {
     color: #381d1d;
 }
 
@@ -132,13 +132,35 @@ header p {
 
 h1, h2, h3, h4, h5, h6 {
     overflow-x: initial;
-    font-family: Magneto;
+    font-family: Raleway;
 }
 
 footer {
     background-color: #FFD7D7;
     padding: 50px 0;
     margin-top: 40px;
+}
+
+.footer-flex img {
+    max-width: 150px;
+}
+
+.footer-flex p {
+    text-align: left;
+}
+
+.footer-flex ul {
+    overflow-x: hidden;
+    padding: 0;
+}
+
+.footer-flex {
+    display: flex;
+    gap: 50px;
+}
+
+footer p {
+    text-align: center;
 }
 
 @media (max-width: 670px) {

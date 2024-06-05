@@ -18,6 +18,12 @@
     <script src="{{ url_for('static', filename='js/coloris.js') }}"></script>
     {% endif %}
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+
+
     <title>{% block title %} {% endblock %} | The Scandal Sandal</title>
 </head>
 <body>
@@ -32,15 +38,15 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="{{url_for('about')}}">About</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{url_for('about')}}">Developers</a>
-            </li>
-            {% if session['logged_in'] %}
-            <li class="nav-item">
                 <a class="nav-link" href="{{url_for('index')}}">Articles</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('scores')}}">Scoring</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('developers')}}">Developers</a>
+            </li>
+            {% if session['logged_in'] %}
             <li class="nav-item">
                 <a class="nav-link" href="{{url_for('create')}}">New Article</a>
             </li>
@@ -65,8 +71,32 @@
 </div>
 <footer>
     <div class="container">
+        <div class="footer-flex">
+            <img src="{{ url_for('static', filename='images/icon.png') }}">
+            <div>
+                <p><b>Links</b></p>
+                <ul>
+                    <li><a href="{{url_for('scores')}}">Scoring</a></li>
+                    <li><a href="{{url_for('index')}}">Articles</a></li>
+                </ul>
+            </div>
+            <div>
+                <p><b>Developers</b></p>
+                <ul>
+                    <li><a href="{{url_for('scores')}}">Documentation</a></li>
+                    <li><a href="{{url_for('iframe_creator')}}">Integration Creator</a></li>
+                </ul>
+            </div>
+            <div>
+                <p><b>Contact</b></p>
+                <ul>
+                    <li><a href="{{url_for('contact')}}">Contact Form</a></li>
+                    <li><a href="mailto:the.scandal.sandal@gmail.com">the.scandal.sandal@gmail.com</a></li>
+                </ul>
+            </div>
+        </div>
         <p>
-            Copyright Mees!
+            © Copyright - The Scandal Sandal, 2024
         </p>
     </div>
 </footer>

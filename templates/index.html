@@ -1,15 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Welcome back, {{ username }}! {% endblock %}</h1>
+    <h1>{% block title %}
+        {% if session['logged_in'] %}
+        Welcome back, {{ username }}!
+        {% else %}
+        Articles
+        {% endif %}
+        {% endblock %}
+
+    </h1>
+
     {% for article in articles %}
         <a href="{{ url_for('article', article_id=article['id']) }}">
-            {{ article['headline'] }}
+            <h4>{{ article['headline'] }}</h4>
         </a>
         <span class="badge badge-primary">{{ article['created'] }}</span>
+            {% if session['logged_in'] %}
         <a href="{{ url_for('edit', id=article['id']) }}">
             <span class="badge badge-warning">Edit</span>
         </a>
+            {% endif %}
         <hr>
     {% endfor %}
 {% endblock %}

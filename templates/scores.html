@@ -1,7 +1,67 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} Scores {% endblock %}</h1>
-<p>What are these scores based on, I </p>
+<h1>{% block title %} Our Scoring System Explained {% endblock %}</h1>
+<p>
+    "The Scandal Sandal" is a comprehensive grading system designed to hold car manufacturers accountable for their
+    actions, particularly when negative news arises about their products or services. This system not only serves to
+    inform consumers but also encourages manufacturers to uphold higher standards of quality and customer service.
+    Here's a detailed explanation of how the scoring system works:
+</p>
+<h2>Grading Mechanism for News Articles</h2>
+<p>
+    Whenever a news article is written about a car manufacturer, particularly one that highlights issues such as faulty
+    software updates, manufacturing defects, or other significant problems, "The Scandal Sandal" grades the manufacturer
+    based on their response and actions. Examples include, and are not limited to:
+<ul>
+    <li><b>Faulty Software Updates:</b> If a manufacturer releases a software update that bricks multiple vehicles.</li>
+    <li><b>Manufacturing Defects:</b> If reports surface about a manufacturer consistently delivering cars with defects.
+    </li>
+</ul>
+</p>
+<h2>Purpose and Impact</h2>
+<p>
+    The primary goal of "The Scandal Sandal" is to hold car manufacturers accountable for their actions and ensure they
+    take responsibility for any issues that arise. By making this information public, it empowers consumers with the
+    knowledge they need to make informed purchasing decisions. This transparency also encourages manufacturers to
+    prioritize quality and customer satisfaction to maintain a positive reputation.
+</p>
+<h2>Scoring Matrix</h2>
+<p>
+    The scores are derived from a strict scoring matrix, which is detailed in the image below.
+</p>
+<p>
+    (The text continues below the image)
+</p>
+
 <img style="max-width: 100%" src="{{ url_for('static', filename='images/scores.png') }}">
+
+<p>
+    Each of these factors is assigned a weight, and the overall score is calculated based on a weighted average.
+</p>
+
+<h2>Manufacturer Transparency</h2>
+<p>
+    Car manufacturers do not have access to their scores before they are published. They cannot see, request, or
+    influence their grading. This ensures that the scores remain unbiased and reflect an accurate assessment of the
+    manufacturer's actions based on the criteria outlined in the scoring matrix.
+</p>
+
+<h2>Role of Advanced LLM</h2>
+<p>
+    The scoring process is assisted by an advanced Language Model (LLM). This LLM analyzes the content of news articles,
+    identifies key details related to the issues, and applies the scoring matrix to generate an objective score. The use
+    of LLM technology ensures consistency and accuracy in evaluating different cases and articles.
+</p>
+<h2>Reporting Discrepancies</h2>
+<p>
+    If any discrepancies are found in the scoring or if there are concerns about the evaluation process, individuals can
+    contact "The Scandal Sandal" team directly by visiting <a href="{{url_for('contact')}}">the contact page</a>. This
+    feedback mechanism allows for continuous improvement of the grading system and ensures that all scores are as fair
+    and accurate as possible.
+</p>
+<p>
+    By maintaining a transparent and rigorous grading system, "The Scandal Sandal" aims to foster accountability within
+    the car manufacturing industry and provide consumers with reliable information to guide their purchasing decisions.
+</p>
 {% endblock %}

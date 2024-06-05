@@ -36,20 +36,21 @@ if __name__ == "__main__":
 @app.route('/')
 def home():
     conn = get_db_connection()
-    articles = conn.execute('SELECT * FROM articles').fetchall()
+    articles = conn.execute('SELECT * FROM articles ORDER BY created DESC LIMIT 3').fetchall()
     conn.close()
     return render_template('home.html', articles=articles)
 
 
 @app.route('/articles')
 def index():
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles ORDER BY created DESC').fetchall()
+    conn.close()
     if 'logged_in' in session:
-        conn = get_db_connection()
-        articles = conn.execute('SELECT * FROM articles ORDER BY created DESC LIMIT 3').fetchall()
-        conn.close()
         return render_template('index.html', articles=articles, username=session['username'])
+    else:
+        return render_template('index.html', articles=articles)
 
-    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -313,13 +314,13 @@ def delete(id):
     return redirect(url_for('login'))
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
 @app.route('/scores')
 def scores():
     return render_template('scores.html')
+
+@app.route('/developers')
+def developers():
+    return render_template('developers.html')
 
 
 @app.route('/developers/creator')
@@ -439,6 +440,46 @@ def integration(company):
                                font_family=font_family,
                                )
 
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        # Get form data
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+
+        # Check if all required fields are provided
+        if not username or not password or not email:
+            flash('All fields (Username, Password, Email Address) are required!')
+            return render_template('register.html')
+
+        account = get_account(username, password)
+
+        if account:
+            flash('An account with this username already exists!')
+            return render_template('register.html')
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            flash('Invalid email address!')
+            return render_template('register.html')
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            flash('Username must contain only characters and numbers!')
+            return render_template('register.html')
+        else:
+            hashed_pass = password + app.secret_key
+            hashed_pass = hashlib.sha1(hashed_pass.encode())
+            password = hashed_pass.hexdigest()
+
+            # Insert the data into the database
+            with get_db_connection() as conn:
+                conn.execute('INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)',
+                             (username, password, email))
+                conn.commit()
+
+            flash("Thanks for contacting us, we'll contact you shortly!")
+            render_template('contact.html')
+
+    return render_template('contact.html')
 
 @app.errorhandler(404)
 def page_not_found(e):
