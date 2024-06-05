@@ -30,9 +30,6 @@ app = Flask(__name__,
 app.url_map.strict_slashes = False
 app.config['SECRET_KEY'] = 'your secret key'
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
-
 @app.route('/')
 def home():
     conn = get_db_connection()
@@ -512,3 +509,7 @@ def get_account(username, password=None):
                             (username, password)).fetchone()
 
     return user
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
