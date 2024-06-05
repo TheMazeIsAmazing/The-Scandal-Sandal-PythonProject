@@ -163,10 +163,27 @@ cython_debug/
 database.db
 
 # Vps stuff
+# Byte-compiled / optimized / DLL files
 bin/
-[16
-[64
-lib64/
-nohup.out
-pyvenv.cfg
-See
+
+# Profiling data
+.prof
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# System files
+*.swp
+*~
+
+# pyenv
+.python-version
+
+# Pylint
+.pylint.d/
+
