@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 import os
 import json
 import re
-import subprocess
 
 # Load the .env file
 load_dotenv()
@@ -30,7 +29,6 @@ app = Flask(__name__,
 
 app.url_map.strict_slashes = False
 app.config['SECRET_KEY'] = 'your secret key'
-
 
 @app.route('/')
 def home():
@@ -299,7 +297,7 @@ def edit(id):
     return redirect(url_for('login'))
 
 
-@app.route('/<int:id>/delete', methods=['POST', ])
+@app.route('/<int:id>/delete', methods=['POST',])
 def delete(id):
     if 'logged_in' in session:
         article = get_article(id)
@@ -316,7 +314,6 @@ def delete(id):
 @app.route('/scores')
 def scores():
     return render_template('scores.html')
-
 
 @app.route('/developers')
 def developers():
@@ -480,21 +477,6 @@ def contact():
             render_template('contact.html')
 
     return render_template('contact.html')
-
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    if request.method == 'POST':
-        # Pull changes from the GitHub repository
-        subprocess.run(['git', 'pull', 'origin', 'master'])
-
-        # Restart the Flask app (assuming you're using Supervisor)
-        subprocess.run(['sudo', 'supervisorctl', 'restart', 'your_flaskapp'])
-
-        return 'Webhook received successfully!', 200
-    else:
-        return 'Method not allowed', 405
-
 
 @app.errorhandler(404)
 def page_not_found(e):
