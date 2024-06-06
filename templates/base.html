@@ -73,30 +73,33 @@
     <div class="container">
         <div class="footer-flex">
             <img src="{{ url_for('static', filename='images/icon.png') }}">
-            <div>
-                <p><b>Links</b></p>
-                <ul>
-                    <li><a href="{{url_for('scores')}}">Scoring</a></li>
-                    <li><a href="{{url_for('index')}}">Articles</a></li>
-                </ul>
-            </div>
-            <div>
-                <p><b>Developers</b></p>
-                <ul>
-                    <li><a href="{{url_for('scores')}}">Documentation</a></li>
-                    <li><a href="{{url_for('iframe_creator')}}">Integration Creator</a></li>
-                </ul>
-            </div>
-            <div>
-                <p><b>Contact</b></p>
-                <ul>
-                    <li><a href="{{url_for('contact')}}">Contact Form</a></li>
-                    <li><a href="mailto:the.scandal.sandal@gmail.com">the.scandal.sandal@gmail.com</a></li>
-                </ul>
+            <div class="footer-links">
+                <div>
+                    <p><b>Links</b></p>
+                    <ul>
+                        <li><a href="{{url_for('index')}}">Articles</a></li>
+                        <li><a href="{{url_for('contact')}}">Contact us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p><b>Developers</b></p>
+                    <ul>
+                        <li><a href="{{url_for('scores')}}">Documentation</a></li>
+                        <li><a href="{{url_for('iframe_creator')}}">Integration Creator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p><b>Information</b></p>
+                    <ul>
+                        <li><a href="{{url_for('scores')}}">Scoring</a></li>
+                        <li><a href="{{url_for('privacy')}}">Privacy Statement</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
+
         <p>
-            © Copyright - The Scandal Sandal, 2024
+            © 2024 The Scandal Sandal. All rights reserved
         </p>
     </div>
 </footer>

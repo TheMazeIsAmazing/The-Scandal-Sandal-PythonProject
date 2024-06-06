@@ -30,6 +30,7 @@ app = Flask(__name__,
 app.url_map.strict_slashes = False
 app.config['SECRET_KEY'] = 'your secret key'
 
+
 @app.route('/')
 def home():
     conn = get_db_connection()
@@ -297,7 +298,7 @@ def edit(id):
     return redirect(url_for('login'))
 
 
-@app.route('/<int:id>/delete', methods=['POST',])
+@app.route('/<int:id>/delete', methods=['POST', ])
 def delete(id):
     if 'logged_in' in session:
         article = get_article(id)
@@ -314,6 +315,12 @@ def delete(id):
 @app.route('/scores')
 def scores():
     return render_template('scores.html')
+
+
+@app.route('/privacy-statement')
+def privacy():
+    return render_template('privacy.html')
+
 
 @app.route('/developers')
 def developers():
@@ -477,6 +484,7 @@ def contact():
             render_template('contact.html')
 
     return render_template('contact.html')
+
 
 @app.errorhandler(404)
 def page_not_found(e):

@@ -156,10 +156,24 @@ footer {
 
 .footer-flex {
     display: flex;
+    flex-wrap: wrap-reverse;
+    justify-content: space-between;
     gap: 50px;
+    align-items: center;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-links a {
+    color: #381d1d;
 }
 
 footer p {
+    margin-top: 40px;
     text-align: center;
 }
 
@@ -174,4 +188,16 @@ footer p {
     header {
         margin-left: -5vw;
     }
+
+    .footer-flex {
+        display: block;
+        text-align: center;
+    }
+
+    .footer-links {
+        display: block;
+        text-align: left;
+        padding-left: 8vw;
+    }
+
 }
