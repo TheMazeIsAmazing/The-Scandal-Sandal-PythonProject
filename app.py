@@ -36,7 +36,7 @@ def home():
     conn = get_db_connection()
     articles = conn.execute('SELECT * FROM articles ORDER BY created DESC LIMIT 3').fetchall()
     conn.close()
-    return render_template('home.html', articles=articles)
+    return render_template('home.html', articles=articles, render_header=True)
 
 
 @app.route('/articles')

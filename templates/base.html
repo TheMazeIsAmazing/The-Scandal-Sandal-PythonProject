@@ -63,6 +63,11 @@
 
     </div>
 </nav>
+{% if render_header %}
+<header>
+    <p>Avoiding scandalous companies, <br> made easy!</p>
+</header>
+{% endif %}
 <div class="container">
     {% for message in get_flashed_messages() %}
     <div class="alert alert-danger">{{ message }}</div>
