@@ -106,9 +106,7 @@ body {
 }
 
 header {
-    margin-left: -15vw;
     margin-right: 0;
-    width: 115vw;
     height: 400px;
     padding-left: 10vw;
     display: flex;
@@ -177,18 +175,7 @@ footer p {
     text-align: center;
 }
 
-@media (max-width: 670px) {
-    header {
-        justify-content: center !important;
-        padding-left: 10vw;
-    }
-}
-
 @media (max-width: 540px) {
-    header {
-        margin-left: -5vw;
-    }
-
     .footer-flex {
         display: block;
         text-align: center;
