@@ -5,5 +5,26 @@
 <a href="{{ url_for('api_keys') }}">
     <button class="btn btn-primary">API-keys</button>
 </a>
-<p>To Finish</p>
+<br>
+<br>
+<br>
+<h2>API Overview</h2>
+<div class="d-flex p-2">
+    <div>
+        <h3>Usage per Month</h3>
+        <img src="data:image/png;base64,{{ bar_chart }}" alt="Bar Chart">
+    </div>
+    <div>
+        <h3>Usage by Key</h3>
+        <img src="data:image/png;base64,{{ pie_chart }}" alt="Pie Chart">
+    </div>
+</div>
+
+
+<h3>Top 5 Origins</h3>
+<ul>
+    {% for origin, count in top_origins.items() %}
+    <li>{{ origin }}: {{ count }}</li>
+    {% endfor %}
+</ul>
 {% endblock %}

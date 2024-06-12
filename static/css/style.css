@@ -175,6 +175,10 @@ footer p {
     text-align: center;
 }
 
+.d-flex img {
+    max-width: 400px;
+}
+
 @media (max-width: 540px) {
     .footer-flex {
         display: block;
