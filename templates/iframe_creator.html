@@ -111,9 +111,9 @@
         // Get the copyable iframe code element
         const copyText = document.getElementById("iframe-dom");
         // Copy the iframe code to clipboard
-        navigator.clipboard.writeText(copyText.innerText);
+        navigator.clipboard.writeText(copyText.value);
         // Alert the user about the copied text
-        alert("Copied the text: " + copyText.innerText);
+        alert("Copied the text: " + copyText.value);
     }
 
     // Function to update the border color property
