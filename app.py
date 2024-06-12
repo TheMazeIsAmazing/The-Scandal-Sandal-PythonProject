@@ -341,6 +341,97 @@ def iframe_creator():
     return render_template('iframe_creator.html', load_colour_picker=True, company="Score preview")
 
 
+@app.route('/developers/api_keys')
+def api_keys():
+    if 'logged_in' in session:
+        conn = get_db_connection()
+        if session['role'] == 1:
+            keys = conn.execute('SELECT * FROM api_keys').fetchall()
+        else:
+            keys = conn.execute('SELECT * FROM api_keys WHERE account_id = ?', (session['id'],)).fetchall()
+        conn.close()
+        return render_template('api_keys.html', api_keys=keys)
+
+    return redirect(url_for('login'))
+
+@app.route('/developers/api_keys/<int:id>')
+def api_key(id):
+    if 'logged_in' in session:
+        db_api_key = get_api_key(id)
+        return render_template('api_key.html', api_key=db_api_key)
+
+    return redirect(url_for('login'))
+
+
+@app.route('/developers/api_keys/create', methods=['GET', 'POST'])
+def create_api_key():
+    if 'logged_in' in session:
+        if request.method == 'POST':
+            # Get form data
+            note = request.form.get('note')
+            account_id = session['id']
+
+            # Check if all required fields are provided
+            if not note:
+                flash('Note is required!')
+                return render_template('register.html')
+            else:
+                hashed_data = note + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + app.secret_key
+                hashed_data = hashlib.sha1(hashed_data.encode())
+                key = 'sc_api-' + hashed_data.hexdigest()
+
+                with get_db_connection() as conn:
+                    conn.execute('INSERT INTO api_keys (key, note, account_id) VALUES (?, ?, ?)',
+                                 (key, note, account_id))
+                    conn.commit()
+
+                # Redirect to the index page after successful insertion
+                flash('Your API key has been created!')
+                return redirect(url_for('api_keys'))
+
+        # Render the create.html template for GET requests
+        return render_template('create_api_key.html')
+
+    return redirect(url_for('login'))
+
+
+@app.route('/developers/api_keys/<int:id>/edit', methods=('GET', 'POST'))
+def edit_api_key(id):
+    if 'logged_in' in session:
+        db_api_key = get_api_key(id)
+
+        if request.method == 'POST':
+            note = request.form['note']
+
+            if not note:
+                flash('Note is required!')
+            else:
+                conn = get_db_connection()
+                conn.execute(
+                    'UPDATE api_keys SET note = ?'
+                    ' WHERE id = ?',
+                    (note, id))
+                conn.commit()
+                conn.close()
+                return redirect(url_for('api_keys'))
+
+        return render_template('edit_api_key.html', api_key=db_api_key)
+
+    return redirect(url_for('login'))
+
+
+@app.route('/developers/api_keys/<int:id>/delete', methods=['POST', ])
+def delete_api_key(id):
+    if 'logged_in' in session:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM api_keys WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        flash('API-key was successfully deleted!')
+        return redirect(url_for('api_keys'))
+
+    return redirect(url_for('login'))
+
 @app.route('/api')
 def api():
     conn = get_db_connection()
@@ -535,15 +626,27 @@ def get_article(id):
                            (id,)).fetchone()
     conn.close()
     if article is None:
-        abort(404)
+        flash('Invalid Article ID!')
+        return redirect(url_for('index'))
     return article
+
+
+def get_api_key(id):
+    conn = get_db_connection()
+    api_key = conn.execute('SELECT * FROM api_keys WHERE id = ?',
+                           (id,)).fetchone()
+    conn.close()
+    if api_key is None:
+        flash('Invalid API key!')
+        return redirect(url_for('api_keys'))
+    return api_key
 
 
 def get_account(username, password=None):
     conn = get_db_connection()
     if password is None:
         user = conn.execute('SELECT * FROM accounts WHERE username = ?',
-                            (username)).fetchone()
+                            (username,)).fetchone()
     else:
         user = conn.execute('SELECT * FROM accounts WHERE username = ? AND password = ?',
                             (username, password)).fetchone()

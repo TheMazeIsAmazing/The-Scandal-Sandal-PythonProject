@@ -53,6 +53,9 @@
             </li>
             {% endif %}
             <li class="nav-item">
+                <a class="nav-link" href="{{url_for('api_keys')}}">API-Keys</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
             </li>
             {% endif %}
@@ -87,13 +90,13 @@
                 <div>
                     <p><b>Developers</b></p>
                     <ul>
-                        <li><a href="{{url_for('scores')}}">Documentation</a></li>
-                        <li><a href="{{url_for('iframe_creator')}}">Integration Creator</a></li>
                         {% if session['logged_in'] %}
                         <li><a href="{{url_for('overview')}}">Account</a></li>
                         {% else %}
                         <li><a href="{{url_for('login')}}">Account</a></li>
                         {% endif %}
+                        <li><a href="{{url_for('scores')}}">Documentation</a></li>
+                        <li><a href="{{url_for('iframe_creator')}}">Integration Creator</a></li>
                     </ul>
                 </div>
                 <div>

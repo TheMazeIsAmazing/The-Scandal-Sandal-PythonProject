@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %} {{ api_key['note'] }} {% endblock %}</h2>
+    <span class="badge badge-primary">{{ api_key['created'] }}</span>
+    <p><b>Key:</b> {{ api_key['key'] }}</p>
+{% endblock %}

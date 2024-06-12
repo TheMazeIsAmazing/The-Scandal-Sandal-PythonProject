@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Welcome back, {{ username }}! {% endblock %}</h1>
-    <p>To Finish</p>
+<h1>{% block title %} Welcome back, {{ username }}! {% endblock %}</h1>
+<a href="{{ url_for('api_keys') }}">
+    <button class="btn btn-primary">API-keys</button>
+</a>
+<p>To Finish</p>
 {% endblock %}

@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS articles;
 DROP TABLE IF EXISTS accounts;
 DROP TABLE IF EXISTS api_keys;
+DROP TABLE IF EXISTS api_pulls;
 
 CREATE TABLE posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,4 +42,12 @@ CREATE TABLE api_keys (
     note TEXT NOT NULL,
     account_id INTEGER,
     FOREIGN KEY (account_id) REFERENCES accounts (id)
+);
+
+CREATE TABLE api_pulls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    key INTEGER,
+    origin TEXT NOT NULL,
+    FOREIGN KEY (key) REFERENCES api_keys (id)
 );
