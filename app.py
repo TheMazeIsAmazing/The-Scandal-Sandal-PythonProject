@@ -142,9 +142,9 @@ def index():
     return render_template('index.html', articles=articles)
 
 
-@app.route('/articles/<int:article_id>')
-def article(article_id):
-    db_article = get_article(article_id)
+@app.route('/articles/<int:id>')
+def article(id):
+    db_article = get_article(id)
     return render_template('article.html', article=db_article)
 
 
@@ -529,10 +529,10 @@ def get_db_connection():
     return conn
 
 
-def get_article(article_id):
+def get_article(id):
     conn = get_db_connection()
     article = conn.execute('SELECT * FROM articles WHERE id = ?',
-                           (article_id,)).fetchone()
+                           (id,)).fetchone()
     conn.close()
     if article is None:
         abort(404)

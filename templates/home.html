@@ -26,7 +26,7 @@
     <h2>Recent Articles</h2>
     <div>
         {% for article in articles %}
-        <a href="{{ url_for('article', article_id=article['id']) }}">
+        <a href="{{ url_for('article', id=article['id']) }}">
             <p>{{ article['headline'] }}</p>
         </a>
         <span class="badge badge-primary">{{ article['created'] }}</span>
