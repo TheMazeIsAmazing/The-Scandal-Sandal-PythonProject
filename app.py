@@ -530,75 +530,88 @@ def api(key):
 
 
 @app.route('/api/integration/')
-@app.route('/api/integration/<company>')
-def integration(company):
+@app.route('/api/integration/<company>/<key>')
+def integration(company=None, key=None):
     color_bg = request.args.get('color-bg', 'white')
     color_container = request.args.get('color-container', 'rosybrown')
     border_color = request.args.get('border-color', 'black')
     score_display = request.args.get('score-display', 'scores-unfilled')
     font_family = request.args.get('font-family', 'Verdana')
 
-    if company:
-        conn = get_db_connection()
-        articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
-                                (company.lower(),)).fetchall()
-        conn.close()
+    if company and key:
+        db_api_key = get_api_key(None, key)
+        if db_api_key:
+            key_id = db_api_key['id']
 
-        if articles.__len__() != 0:
-            car_brand_score = {}
+            if request.headers.getlist("X-Forwarded-For"):
+                client_ip = request.headers.getlist("X-Forwarded-For")[0]
+            else:
+                client_ip = request.remote_addr
 
-            articles_list = [dict(article) for article in articles]
+            try:
+                with get_db_connection() as conn:
+                    conn.execute('INSERT INTO api_pulls (key, origin) VALUES (?, ?)',
+                                 (key_id, client_ip))
+                    conn.commit()
 
-            for article in articles_list:
-                car_brand = article.get('company')
+                    articles = conn.execute('SELECT * FROM articles WHERE LOWER(company) = ?',
+                                            (company.lower(),)).fetchall()
 
-                if car_brand.lower() not in car_brand_score:
-                    car_brand_score[car_brand] = {
-                        'customer_service': [int(article.get('score_openai_customer_service'))],
-                        'reliability': [int(article.get('score_openai_reliability'))],
-                        'responsibility': [int(article.get('score_openai_responsibility'))]
-                    }
-                else:
-                    car_brand_score[car_brand]['customer_service'].append(
-                        int(article.get('score_openai_customer_service')))
-                    car_brand_score[car_brand]['reliability'].append(
-                        int(article.get('score_openai_reliability')))
-                    car_brand_score[car_brand]['responsibility'].append(
-                        int(article.get('score_openai_responsibility')))
+                    if articles:
+                        car_brand_score = {}
+                        articles_list = [dict(article) for article in articles]
 
-            for car_brand, scores in car_brand_score.items():
-                for category in scores:
-                    scores[category] = mean(scores[category])
+                        for article in articles_list:
+                            car_brand = article.get('company')
+                            if car_brand.lower() not in car_brand_score:
+                                car_brand_score[car_brand] = {
+                                    'customer_service': [int(article.get('score_openai_customer_service'))],
+                                    'reliability': [int(article.get('score_openai_reliability'))],
+                                    'responsibility': [int(article.get('score_openai_responsibility'))]
+                                }
+                            else:
+                                car_brand_score[car_brand]['customer_service'].append(
+                                    int(article.get('score_openai_customer_service')))
+                                car_brand_score[car_brand]['reliability'].append(
+                                    int(article.get('score_openai_reliability')))
+                                car_brand_score[car_brand]['responsibility'].append(
+                                    int(article.get('score_openai_responsibility')))
 
-            return render_template('iframe.html',
-                                   company=company,
-                                   customer_service=car_brand_score[car_brand]['customer_service'],
-                                   reliability=car_brand_score[car_brand]['reliability'],
-                                   responsibility=car_brand_score[car_brand]['responsibility'],
-                                   color_bg=color_bg,
-                                   color_container=color_container,
-                                   border_color=border_color,
-                                   score_display=score_display,
-                                   font_family=font_family,
-                                   )
+                        for car_brand, scores in car_brand_score.items():
+                            for category in scores:
+                                scores[category] = mean(scores[category])
 
-        return render_template('iframe.html',
-                               company=company,
-                               color_bg=color_bg,
-                               color_container=color_container,
-                               border_color=border_color,
-                               score_display=score_display,
-                               font_family=font_family,
-                               )
-    else:
-        return render_template('iframe.html',
-                               company='Score preview',
-                               color_bg=color_bg,
-                               color_container=color_container,
-                               border_color=border_color,
-                               score_display=score_display,
-                               font_family=font_family,
-                               )
+                        return render_template('iframe.html',
+                                               company=company,
+                                               customer_service=car_brand_score[car_brand]['customer_service'],
+                                               reliability=car_brand_score[car_brand]['reliability'],
+                                               responsibility=car_brand_score[car_brand]['responsibility'],
+                                               color_bg=color_bg,
+                                               color_container=color_container,
+                                               border_color=border_color,
+                                               score_display=score_display,
+                                               font_family=font_family,
+                                               )
+
+                    return render_template('iframe.html',
+                                           company=company,
+                                           color_bg=color_bg,
+                                           color_container=color_container,
+                                           border_color=border_color,
+                                           score_display=score_display,
+                                           font_family=font_family,
+                                           )
+            except sqlite3.Error as e:
+                return str(e)
+
+    return render_template('iframe.html',
+                           company='Score preview',
+                           color_bg=color_bg,
+                           color_container=color_container,
+                           border_color=border_color,
+                           score_display=score_display,
+                           font_family=font_family,
+                           )
 
 
 @app.route('/contact', methods=['GET', 'POST'])
