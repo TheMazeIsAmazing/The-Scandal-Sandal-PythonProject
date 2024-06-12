@@ -20,8 +20,6 @@ from datetime import datetime
 # Load the .env file
 load_dotenv()
 
-api_key = os.getenv('OPENAI_API_KEY')
-
 # Initialize the OpenAI client with the API key from the environment variable
 client = OpenAI(
     api_key=os.getenv('OPENAI_API_KEY'),
