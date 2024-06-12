@@ -3,26 +3,27 @@
 {% block content %}
 <h1>{% block title %} Contact Us {% endblock %}</h1>
 
-<p>You could also send your email directly at: <a href="mailto:the.scandal.sandal@gmail.com">the.scandal.sandal@gmail.com</a>, or you could fill out the form below.</p>
+<p>You could send us your email directly at: <a href="mailto:the.scandal.sandal@gmail.com">the.scandal.sandal@gmail.com</a>,
+    or fill out the form below.</p>
 
 <form method="post">
     <div class="form-group">
         <label for="name">Name</label>
         <input id="name" type="text" name="name"
                placeholder="Peter Johnson Jr." class="form-control"
-               value="{{ request.form['name'] }}" />
+               value="{{ request.form['name'] }}"/>
     </div>
     <div class="form-group">
         <label for="subject">Subject</label>
         <input id="subject" type="text" name="subject"
                placeholder="Enquiry about {...}" class="form-control"
-               value="{{ request.form['subject'] }}" />
+               value="{{ request.form['subject'] }}"/>
     </div>
     <div class="form-group">
         <label for="email">Email address</label>
         <input id="email" type="text" name="email"
                placeholder="name@example.com" class="form-control"
-               value="{{ request.form['email'] }}" />
+               value="{{ request.form['email'] }}"/>
     </div>
     <div class="form-group">
         <label for="message">Message</label>
