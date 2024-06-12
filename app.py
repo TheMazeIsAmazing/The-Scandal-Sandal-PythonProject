@@ -11,6 +11,11 @@ from dotenv import load_dotenv
 import os
 import json
 import re
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 
 # Load the .env file
 load_dotenv()
@@ -39,17 +44,6 @@ def home():
     return render_template('home.html', articles=articles, render_header=True)
 
 
-@app.route('/articles')
-def index():
-    conn = get_db_connection()
-    articles = conn.execute('SELECT * FROM articles ORDER BY created DESC').fetchall()
-    conn.close()
-    if 'logged_in' in session:
-        return render_template('index.html', articles=articles, username=session['username'])
-    else:
-        return render_template('index.html', articles=articles)
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -72,8 +66,9 @@ def login():
             session['logged_in'] = True
             session['id'] = account['id']
             session['username'] = account['username']
+            session['role'] = account['role']
             flash('Logged in successfully!')
-            return redirect(url_for('index'))
+            return redirect(url_for('overview'))
         else:
             flash('Combination of username and password is incorrect.')
             return render_template('login.html')
@@ -133,13 +128,29 @@ def register():
     return render_template('register.html')
 
 
+@app.route('/account-overview')
+def overview():
+    if 'logged_in' in session:
+        return render_template('logged_in_page.html', username=session['username'])
+
+    return redirect(url_for('login'))
+
+
+@app.route('/articles')
+def index():
+    conn = get_db_connection()
+    articles = conn.execute('SELECT * FROM articles ORDER BY created DESC').fetchall()
+    conn.close()
+    return render_template('index.html', articles=articles)
+
+
 @app.route('/articles/<int:article_id>')
 def article(article_id):
     db_article = get_article(article_id)
     return render_template('article.html', article=db_article)
 
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/articles/create', methods=['GET', 'POST'])
 def create():
     if 'logged_in' in session:
         if request.method == 'POST':
@@ -256,7 +267,7 @@ def create():
     return redirect(url_for('login'))
 
 
-@app.route('/<int:id>/edit', methods=('GET', 'POST'))
+@app.route('/articles/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
     if 'logged_in' in session:
         article = get_article(id)
@@ -298,7 +309,7 @@ def edit(id):
     return redirect(url_for('login'))
 
 
-@app.route('/<int:id>/delete', methods=['POST', ])
+@app.route('/articles/<int:id>/delete', methods=['POST', ])
 def delete(id):
     if 'logged_in' in session:
         article = get_article(id)
@@ -449,41 +460,64 @@ def integration(company):
 def contact():
     if request.method == 'POST':
         # Get form data
-        username = request.form.get('username')
-        password = request.form.get('password')
+        name = request.form.get('name')
+        subject = request.form.get('subject')
         email = request.form.get('email')
+        message = request.form.get('message')
 
         # Check if all required fields are provided
-        if not username or not password or not email:
-            flash('All fields (Username, Password, Email Address) are required!')
-            return render_template('register.html')
-
-        account = get_account(username, password)
-
-        if account:
-            flash('An account with this username already exists!')
-            return render_template('register.html')
+        if not name or not subject or not email or not message:
+            flash('All fields (Name, Subject, Email Address and Message) are required!')
+            return render_template('contact.html', name=name, subject=subject, email=email, message=message)
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             flash('Invalid email address!')
-            return render_template('register.html')
-        elif not re.match(r'[A-Za-z0-9]+', username):
-            flash('Username must contain only characters and numbers!')
-            return render_template('register.html')
+            return render_template('contact.html', name=name, subject=subject, email=email, message=message)
+        elif not re.match(r'[A-Za-z0-9]+', name):
+            flash('Invalid name!')
+            return render_template('contact.html', name=name, subject=subject, email=email, message=message)
+        elif not re.match(r'[A-Za-z0-9]+', subject):
+            flash('Invalid subject!')
+            return render_template('contact.html', name=name, subject=subject, email=email, message=message)
         else:
-            hashed_pass = password + app.secret_key
-            hashed_pass = hashlib.sha1(hashed_pass.encode())
-            password = hashed_pass.hexdigest()
+            port = 465  # For SSL
+            smtp_server = "smtp.gmail.com"
+            sender_email = os.getenv('SMTP_USER')  # Enter your address
+            password = os.getenv('SMTP_PASS')
+            receiver_email = email
 
-            # Insert the data into the database
-            with get_db_connection() as conn:
-                conn.execute('INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)',
-                             (username, password, email))
-                conn.commit()
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = sender_email
+            msg['Subject'] = subject
+            msg['Reply-To'] = receiver_email
 
-            flash("Thanks for contacting us, we'll contact you shortly!")
-            render_template('contact.html')
+            # Get current datetime
+            current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    return render_template('contact.html')
+            # Format the message with additional info
+            formatted_message = f"""\
+[{current_datetime}]
+Written by: {name}, {email}
+
+{message}"""
+
+            msg.attach(MIMEText(formatted_message, 'plain'))
+
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+
+            try:
+                with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                    server.login(sender_email, password)
+                    server.sendmail(sender_email, sender_email, msg.as_string())
+
+                flash("Thanks for contacting us, we'll contact you shortly!")
+                return render_template('contact.html', name='', subject='', email='', message='')
+            except Exception as e:
+                flash(f"An error occurred while sending the email: {e}")
+                return render_template('contact.html', name=name, subject=subject, email=email, message=message)
+
+    return render_template('contact.html', name='', subject='', email='', message='')
 
 
 @app.errorhandler(404)
